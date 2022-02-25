@@ -1,0 +1,10 @@
+# Main
+__pycache__/
+env/
+dist/
+kureta.egg-info/
+*.log
+requirements.txt
+
+# Project
+.idea/
