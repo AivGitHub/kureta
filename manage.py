@@ -9,6 +9,14 @@ def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
     try:
+        import secure
+    except ImportError:
+        raise ImportError('Project is not initialized')
+
+    os.environ.setdefault('DEFAULT_DATABASE_PASSWORD', secure.DEFAULT_DATABASE_PASSWORD)
+    os.environ.setdefault('SECRET_KEY', secure.SECRET_KEY)
+
+    try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
