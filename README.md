@@ -1,4 +1,4 @@
-# Clutcher
+# Kureta
 Mail client
 
 ## Installation
