@@ -6,9 +6,13 @@ import sys
 
 
 class Main:
-    def __init__(self, settings_name: str = 'config.py', readme_name: str = 'README.md') -> None:
+
+    def __init__(self, settings_name: str = 'settings.py', readme_name: str = 'README.md') -> None:
         # local variables
         _python_version: tuple = ()
+
+        # self variables
+        self._attributes_splitter: str = ' = '
 
         # Setter independent
         self.config_text = settings_name
@@ -18,10 +22,10 @@ class Main:
         self.attributes = self.config_text
 
         # Other
-        _python_version = tuple(int(v) for v in self.attributes.get('PYTHON_REQUIRES').split('.'))
+        _python_version = tuple(int(v) for v in self.attributes.get('PROJECT_PYTHON_REQUIRES').split('.'))
 
         if sys.version_info < _python_version:
-            raise RuntimeError(f'This app works with Python {self.attributes.get("PYTHON_REQUIRES")}+')
+            raise RuntimeError(f'This app works with Python {self.attributes.get("PROJECT_PYTHON_REQUIRES")}+')
 
     @property
     def config_text(self) -> str:
@@ -46,12 +50,21 @@ class Main:
     @attributes.setter
     def attributes(self, config_text):
         _splitter: str = ' = '
-        _lines: list = []
+        _attributes: dict = {}
 
-        for line in config_text.splitlines():
-            _lines.append(line)
+        for _line in config_text.splitlines():
+            _line = _line.strip()
+            _parted = _line.split(self._attributes_splitter)
 
-        self.__attributes = {attr.split(_splitter)[0]: attr.split(_splitter)[1][1:-1] for attr in _lines}
+            try:
+                __key = _parted[0]
+                __value = _parted[1][1:-1]
+
+                _attributes.update({__key: __value})
+            except IndexError:
+                continue
+
+        self.__attributes = _attributes
 
     @staticmethod
     def get_text(file_name) -> str:
@@ -62,17 +75,17 @@ main = Main()
 
 
 setup(
-    name=main.attributes.get('NAME'),
-    version=main.attributes.get('VERSION'),
-    url=main.attributes.get('URL'),
+    name=main.attributes.get('PROJECT_NAME'),
+    version=main.attributes.get('PROJECT_VERSION'),
+    url=main.attributes.get('PROJECT_URL'),
     project_urls={
-        'Source': main.attributes.get('SOURCE'),
-        'Bug Tracker': main.attributes.get('BUG_TRACKER'),
+        'Source': main.attributes.get('PROJECT_SOURCE'),
+        'Bug Tracker': main.attributes.get('PROJECT_BUG_TRACKER'),
     },
     license='MIT',
-    author=main.attributes.get('AUTHOR'),
-    author_email=main.attributes.get('AUTHOR_EMAIL'),
-    description=main.attributes.get('DESCRIPTION'),
+    author=main.attributes.get('PROJECT_AUTHOR'),
+    author_email=main.attributes.get('PROJECT_AUTHOR_EMAIL'),
+    description=main.attributes.get('PROJECT_DESCRIPTION'),
     long_description=main.readme_text,
     long_description_content_type='text/markdown',
     packages=find_packages(),
@@ -81,5 +94,5 @@ setup(
     classifiers=[
         'Programming Language :: Python :: 3',
     ],
-    python_requires=f'>={main.attributes.get("PYTHON_REQUIRES")}',
+    python_requires=f'>={main.attributes.get("PROJECT_PYTHON_REQUIRES")}',
 )

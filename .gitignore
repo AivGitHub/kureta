@@ -4,7 +4,6 @@ env/
 dist/
 kureta.egg-info/
 *.log
-requirements.txt
 
 # Project
 .idea/
