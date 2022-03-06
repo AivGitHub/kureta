@@ -1,5 +1,6 @@
 # Main
 __pycache__/
+migrations/
 env/
 dist/
 kureta.egg-info/
