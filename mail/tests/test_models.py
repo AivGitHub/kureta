@@ -8,4 +8,3 @@ class asdTestCase(TestCase):
 
     def tearDown(self):
         pass
-

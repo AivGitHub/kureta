@@ -1,17 +1,16 @@
 #!/usr/bin/env python
-"""Django's command-line utility for administrative tasks."""
+
 import os
 import sys
 
 
 def main():
-    """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'settings')
 
     try:
         import secure
     except ImportError:
-        raise ImportError('Project is not initialized')
+        raise ImportError(f'Project is not initialized. Please run \' {os.path.realpath(__file__)} server --install\'')
 
     os.environ.setdefault('DEFAULT_DATABASE_PASSWORD', secure.DEFAULT_DATABASE_PASSWORD)
     os.environ.setdefault('SECRET_KEY', secure.SECRET_KEY)

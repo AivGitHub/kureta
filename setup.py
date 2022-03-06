@@ -90,6 +90,12 @@ setup(
     long_description_content_type='text/markdown',
     packages=find_packages(),
     install_requires=[
+        'asgiref==3.5.0',
+        'backports.zoneinfo==0.2.1',
+        'Django==4.0.3',
+        'psycopg2-binary==2.9.3',
+        'python-magic==0.4.25',
+        'sqlparse==0.4.2',
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
