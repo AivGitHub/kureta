@@ -1,0 +1,11 @@
+[
+{
+    "model": "mail.server",
+    "pk": 1,
+    "fields": {
+        "server": "kureta.com",
+        "port": 587,
+        "ssl": true
+    }
+}
+]

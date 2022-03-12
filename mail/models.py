@@ -1,10 +1,92 @@
 import hashlib
 import pathlib
 
+from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin)
+from django.core.mail import send_mail
 from django.db import models
+from django.utils import timezone
 import magic
 
+from mail.managers import UserManager
+
 _magic = magic.Magic(mime=True)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    username = models.CharField(
+        'username',
+        max_length=150,
+        help_text='150 characters or fewer. Letters and digits only.',
+        error_messages={
+            'unique': 'A user with that username already exists.',
+        },
+        null=True,
+        blank=True,
+        unique=True
+    )
+    first_name = models.CharField(
+        'First name',
+        max_length=150,
+        null=True,
+        blank=True
+    )
+    last_name = models.CharField(
+        'Last name',
+        max_length=50,
+        null=True,
+        blank=True
+    )
+    email = models.EmailField(
+        'Email address',
+        null=False,
+        blank=False,
+        unique=True
+    )
+    is_staff = models.BooleanField(
+        'Staff status',
+        default=False,
+        help_text='Designates whether the user can log into this admin site.',
+    )
+    is_active = models.BooleanField(
+        'Active',
+        default=True,
+        help_text='Designates whether this user should be treated as active. '
+                  'Unselect this instead of deleting accounts.',
+    )
+    date_joined = models.DateTimeField(
+        'Date joined',
+        default=timezone.now
+    )
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+
+    class Meta:
+        verbose_name = 'User'
+        verbose_name_plural = 'Users'
+
+    def __str__(self):
+        return self.email
+
+    def clean(self):
+        super().clean()
+        self.email = self.__class__.objects.normalize_email(self.email)
+
+    def get_server(self):
+        return self.email.split('@')[1]
+
+    def get_full_name(self):
+        full_name = f'{self.first_name} {self.last_name}'
+
+        return full_name.strip()
+
+    def get_short_name(self):
+        return self.first_name
+
+    def email_user(self, subject, message, from_email=None, **kwargs):
+        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
 class Server(models.Model):
@@ -12,7 +94,8 @@ class Server(models.Model):
         'Server name',
         max_length=256,
         null=False,
-        blank=False
+        blank=False,
+        unique=True
     )
     port = models.IntegerField(
         'Port',
@@ -26,7 +109,8 @@ class Server(models.Model):
     )
 
     class Meta:
-        db_table = 'server'
+        verbose_name = 'Server'
+        verbose_name_plural = 'Servers'
 
     def __str__(self) -> str:
         return self.server
@@ -44,17 +128,22 @@ class Message(models.Model):
         null=True,
         blank=True
     )
-    sender = models.CharField(
-        'Sender',
-        max_length=256,
-        null=False,
-        blank=False
+    sender = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
     )
     recipients = models.TextField(
         'Recipients',
         null=False,
         blank=False
     )
+
+    class Meta:
+        verbose_name = 'Message'
+        verbose_name_plural = 'Messages'
+
+    def __str__(self) -> str:
+        return str(self.pk)
 
 
 class Attachment(models.Model):
@@ -101,6 +190,10 @@ class Attachment(models.Model):
         null=False,
         blank=False
     )
+
+    class Meta:
+        verbose_name = 'Attachment'
+        verbose_name_plural = 'Attachments'
 
     def __str__(self) -> str:
         return self.path

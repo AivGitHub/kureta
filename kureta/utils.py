@@ -5,14 +5,19 @@ import subprocess
 from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management.utils import get_random_secret_key
 
-from kureta.exception import InitializeDatabaseException
-from kureta.exception import WrongSettingsFileContentException
+from kureta.exceptions import (
+    InitializeDatabaseException,
+    InitializeFixturesException,
+    WrongSettingsFileContentException
+)
 import settings
 
 
 class Database:
 
     PSQL_CONSOLE_COMMAND = 'sudo -u postgres psql -t'
+    FIXTURES_CONSOLE_COMMAND = 'python manage.py loaddata'
+    FIXTURES = ('mail/fixtures/mail_servers.json',)
     __REQUIRED_FIELDS = ('DEFAULT_DATABASE_PASSWORD', 'SECRET_KEY')
 
     def __init__(self, settings_file: str = 'secure.py', secure: bool = False, ignore=True) -> None:
@@ -31,9 +36,27 @@ class Database:
     def __str__(self) -> str:
         return self.database_name
 
-    def initialize(self) -> None:
-        self.initialize_settings_file()
-        self.initialize_database()
+    def initialize_settings_file(self) -> None:
+        _data: str = ''
+        _lines: list = []
+        _secret_key: str = get_random_secret_key()
+
+        if self.settings_file.exists():
+            if self.ignore:
+                return None
+            else:
+                raise FileExistsError(f'File {self.settings_file} exists!')
+
+        if not self.secure:
+            _secret_key = f'{SECRET_KEY_INSECURE_PREFIX}{_secret_key}'
+
+        _lines.append(f'SECRET_KEY = \'{_secret_key}\'')
+        _lines.append(f'DEFAULT_DATABASE_PASSWORD = \'{get_random_secret_key()}\'')
+
+        _data = '\n'.join(_lines)
+
+        self.settings_file.touch()
+        self.settings_file.write_text(f'{_data}\n')
 
     def initialize_database(self) -> None:
         _create_database_file: pathlib.Path = pathlib.Path('create_database.tmp.sql')
@@ -56,6 +79,21 @@ class Database:
 
         if _process.returncode != 0:
             raise InitializeDatabaseException(_err.decode('utf-8'))
+
+    def initialize_fixtures(self) -> None:
+        # Initialize fixture by fixture.
+        for _fixture in self.FIXTURES:
+            _cmd = f'{self.FIXTURES_CONSOLE_COMMAND} {_fixture}'
+            _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            _out, _err = _process.communicate()
+
+            if _process.returncode != 0:
+                raise InitializeFixturesException(_err.decode('utf-8'))
+
+    def initialize(self) -> None:
+        self.initialize_settings_file()
+        self.initialize_database()
+        self.initialize_fixtures()
 
     def __get_secret_parameters(self) -> dict:
         try:
@@ -83,25 +121,3 @@ class Database:
             __database_password = f'{SECRET_KEY_INSECURE_PREFIX}{__database_password}'
 
         return {'DEFAULT_DATABASE_PASSWORD': __database_password, 'SECRET_KEY': __secret_key}
-
-    def initialize_settings_file(self) -> None:
-        _data: str = ''
-        _lines: list = []
-        _secret_key: str = get_random_secret_key()
-
-        if self.settings_file.exists():
-            if self.ignore:
-                return None
-            else:
-                raise FileExistsError(f'File {self.settings_file} exists!')
-
-        if not self.secure:
-            _secret_key = f'{SECRET_KEY_INSECURE_PREFIX}{_secret_key}'
-
-        _lines.append(f'SECRET_KEY = \'{_secret_key}\'')
-        _lines.append(f'DEFAULT_DATABASE_PASSWORD = \'{get_random_secret_key()}\'')
-
-        _data = '\n'.join(_lines)
-
-        self.settings_file.touch()
-        self.settings_file.write_text(f'{_data}\n')

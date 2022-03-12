@@ -25,6 +25,8 @@ PROJECT_SOURCE = 'https://github.com/AivGitHub/kureta'
 PROJECT_URL = 'https://github.com/AivGitHub/kureta'
 PROJECT_VERSION = '0.0.1a0'
 
+LOGOUT_REDIRECT_URL = '/login'
+LOGIN_REDIRECT_URL = '/mail/profile'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +43,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+##################
+# AUTHENTICATION #
+##################
+
+AUTH_USER_MODEL = 'mail.User'
 
 # Application definition
 
@@ -69,7 +76,7 @@ ROOT_URLCONF = 'kureta.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
