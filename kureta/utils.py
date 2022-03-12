@@ -21,6 +21,9 @@ class Database:
     __REQUIRED_FIELDS = ('DEFAULT_DATABASE_PASSWORD', 'SECRET_KEY')
 
     def __init__(self, settings_file: str = 'secure.py', secure: bool = False, ignore=True) -> None:
+        """
+        TODO: Add support for multiple database initialization
+        """
         self.databases = settings.DATABASES.keys()
 
         self.database_name: str = settings.PROJECT_NAME
