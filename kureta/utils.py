@@ -8,6 +8,7 @@ from django.core.management.utils import get_random_secret_key
 from kureta.exceptions import (
     InitializeDatabaseException,
     InitializeFixturesException,
+    InitializeMigrationException,
     WrongSettingsFileContentException
 )
 import settings
@@ -15,10 +16,12 @@ import settings
 
 class Database:
 
+    __REQUIRED_FIELDS = ('DEFAULT_DATABASE_PASSWORD', 'SECRET_KEY')
+
     PSQL_CONSOLE_COMMAND = 'sudo -u postgres psql -t'
     FIXTURES_CONSOLE_COMMAND = 'python manage.py loaddata'
+    MIGRATION_COMMANDS = ('python manage.py makemigrations', 'python manage.py migrate')
     FIXTURES = ('mail/fixtures/mail_servers.json',)
-    __REQUIRED_FIELDS = ('DEFAULT_DATABASE_PASSWORD', 'SECRET_KEY')
 
     def __init__(self, settings_file: str = 'secure.py', secure: bool = False, ignore=True) -> None:
         """
@@ -83,6 +86,14 @@ class Database:
         if _process.returncode != 0:
             raise InitializeDatabaseException(_err.decode('utf-8'))
 
+    def initialize_migrations(self) -> None:
+        for _cmd in self.MIGRATION_COMMANDS:
+            _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            _out, _err = _process.communicate()
+
+            if _process.returncode != 0:
+                raise InitializeMigrationException(_err.decode('utf-8'))
+
     def initialize_fixtures(self) -> None:
         # Initialize fixture by fixture.
         for _fixture in self.FIXTURES:
@@ -96,6 +107,7 @@ class Database:
     def initialize(self) -> None:
         self.initialize_settings_file()
         self.initialize_database()
+        self.initialize_migrations()
         self.initialize_fixtures()
 
     def __get_secret_parameters(self) -> dict:

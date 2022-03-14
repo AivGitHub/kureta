@@ -6,5 +6,9 @@ class InitializeFixturesException(Exception):
     pass
 
 
+class InitializeMigrationException(Exception):
+    pass
+
+
 class WrongSettingsFileContentException(Exception):
     pass
