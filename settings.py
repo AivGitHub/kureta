@@ -25,8 +25,8 @@ PROJECT_SOURCE = 'https://github.com/AivGitHub/kureta'
 PROJECT_URL = 'https://github.com/AivGitHub/kureta'
 PROJECT_VERSION = '0.0.1a0'
 
-LOGOUT_REDIRECT_URL = '/login'
-LOGIN_REDIRECT_URL = '/mail/profile'
+LOGOUT_REDIRECT_URL = '/login/'
+LOGIN_REDIRECT_URL = '/mail/'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -145,6 +145,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / PROJECT_NAME / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

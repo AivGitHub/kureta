@@ -1,0 +1,7 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <p><a href="{% url 'logout' %}">Log Out</a></p>
+
+  Username: <a href="{% url 'mail:profile' %}">{{ user }}</a>
+{% endblock %}

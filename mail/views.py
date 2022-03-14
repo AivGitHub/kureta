@@ -1,9 +1,7 @@
-from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.views import View
 
 from mail.models import Message
@@ -27,7 +25,7 @@ class RegisterView(View):
     def get(self, request, *args, **kwargs):
 
         if request.user.is_authenticated:
-            return redirect('/mail/profile/')
+            return redirect('/mail/')
 
         form = UserCreationForm()
 
@@ -37,15 +35,13 @@ class RegisterView(View):
 class LoginView(DjangoLoginView):
 
     def get(self, request, *args, **kwargs):
-        print(request.GET)
-
         _registered = request.GET.get('registered', None)
 
         if _registered == 'true':
             self.extra_context = {'registered': 'true'}
 
         if request.user.is_authenticated:
-            return redirect('/mail/profile/')
+            return redirect('/mail/')
 
         return super().get(self, request, *args, **kwargs)
 
@@ -66,9 +62,32 @@ class Profile(LoginRequiredMixin, View):
 
         return render(
             request,
-            'profile/messages.html',
+            'profile/profile.html',
             {
                 'messages': _obj,
                 'amount': len(_messages)
+            }
+        )
+
+
+class Feed(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            'profile/feed.html',
+            {
+            }
+        )
+
+
+class ErrorHandler404(View):
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            'error_handlers/404.html',
+            {
             }
         )
