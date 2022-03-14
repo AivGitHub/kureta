@@ -4,7 +4,9 @@ from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.core.exceptions import ValidationError
 
-from mail.models import (Server, User)
+from mail.models import (
+    Server, User
+)
 import settings
 
 
@@ -22,7 +24,7 @@ class UserCreationForm(DjangoUserCreationForm):
     except ProgrammingError:
         pass
 
-    ALLOWED_SERVERS = [__choice[0] for __choice in SERVER_CHOICES]
+    ALLOWED_SERVERS = (__choice[0] for __choice in SERVER_CHOICES)
 
     first_name = forms.CharField(
         max_length=30,
@@ -34,7 +36,7 @@ class UserCreationForm(DjangoUserCreationForm):
     )
     server = forms.ChoiceField(
         label='Server',
-        choices=SERVER_CHOICES
+        choices=list(SERVER_CHOICES)
     )
     username = forms.CharField(
         help_text='50 characters or fewer. Low letters only. '
@@ -50,12 +52,13 @@ class UserCreationForm(DjangoUserCreationForm):
         }
 
     def clean_email(self):
+        __allowed_servers_list = list(self.ALLOWED_SERVERS)
         _email = self.cleaned_data.get('email')
         _email_server = _email.split('@')[1]
 
-        if _email_server not in self.ALLOWED_SERVERS:
+        if _email_server not in __allowed_servers_list:
             raise ValidationError(
-                f'Server should be of the: `{", ".join(self.ALLOWED_SERVERS)}`. Not `{_email_server}`.')
+                f'Server should be of the: `{", ".join(__allowed_servers_list)}`. Not `{_email_server}`.')
 
         return _email
 
