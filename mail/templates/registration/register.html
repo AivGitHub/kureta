@@ -1,24 +1,30 @@
 {% extends 'base.html' %}
 
-{% block title %}Register{% endblock %}
+{% load i18n %}
+
+{% block title %}{% translate 'Register' %}{% endblock %}
 
 {% block content %}
   <h2>Sign up</h2>
+  {% translate 'Have an account?' %}
+  <a class="text-decoration-none" href="/login/">{% translate 'Sign in!' %}</a>
+  <hr>
   <form method="post">
     {% csrf_token %}
     {% for field in form %}
-      <p>
-        {{ field.label_tag }}<br>
-        {{ field }}
-        {% if field.help_text %}
-          <small style="color: grey">{{ field.help_text }}</small>
-        {% endif %}
-        {% for error in field.errors %}
-          <p style="color: red">{{ error }}</p>
-        {% endfor %}
-      </p>
+      <div class="mb-3">
+        <p>
+          <label class="form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small style="color: grey">{{ field.help_text }}</small>
+          {% endif %}
+          {% for error in field.errors %}
+            <p style="color: red">{{ error }}</p>
+          {% endfor %}
+        </p>
+      </div>
     {% endfor %}
-    <button type="submit">Sign up</button>
+    <button type="submit" class="btn btn-primary">{% translate 'Sign Up' %}</button>
   </form>
-  Have an account? <a href="/login">Sign in!</a>
 {% endblock %}

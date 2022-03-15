@@ -149,6 +149,9 @@ STATICFILES_DIRS = [
     BASE_DIR / PROJECT_NAME / 'static',
 ]
 
+if not DEBUG:
+    STATIC_ROOT = f'/urs/share/{PROJECT_NAME}/static/'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 

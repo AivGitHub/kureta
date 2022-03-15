@@ -1,18 +1,26 @@
 {% extends 'base.html' %}
 
-{% block title %}Login{% endblock %}
+{% load i18n %}
+
+{% block title %}{% translate 'Login' %}{% endblock %}
 
 {% block content %}
   {% if registered %}
-    Now you can Sign in
+    <h2>{% translate 'Now you can Sign In' %}</h2>
+  {% else %}
+    <h2>Log In</h2>
+    {% translate 'Do not have an account?' %}
+    <a class="text-decoration-none" href="/register/">{% translate 'Sign Up' %}</a>
   {% endif %}
-  <h2>Log In</h2>
+  <hr>
   <form method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Log In</button>
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
+        {{ field }}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">{% translate 'Sign In' %}</button>
   </form>
-  {% if not registered %}
-    Don't have an account? <a href="/register">Sign up</a>
-  {% endif %}
 {% endblock %}

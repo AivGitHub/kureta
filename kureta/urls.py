@@ -18,11 +18,13 @@ from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 from django.views.generic import RedirectView
 
+from mail.forms import AuthenticationForm
 from mail.views import (
     ErrorHandler404,
     LoginView,
     RegisterView
 )
+
 
 # Error handlers
 handler404 = ErrorHandler404.as_view()
@@ -30,11 +32,11 @@ handler404 = ErrorHandler404.as_view()
 
 # Main URL patterns
 urlpatterns = [
-    # Base
+    # Base paths
     path('', RedirectView.as_view(url='mail/'), name='index'),
     path('admin/', admin.site.urls),
     path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
+    path('login/', LoginView.as_view(authentication_form=AuthenticationForm), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     # Included
     path('mail/', include('mail.urls', namespace='mail'), name='mail'),

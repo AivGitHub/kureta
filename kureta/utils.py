@@ -6,12 +6,55 @@ from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management.utils import get_random_secret_key
 
 from kureta.exceptions import (
+    InitializeBoostrapException,
     InitializeDatabaseException,
     InitializeFixturesException,
     InitializeMigrationException,
     WrongSettingsFileContentException
 )
 import settings
+
+
+class Static:
+
+    BOOTSTRAP_LINK = 'https://github.com/twbs/bootstrap/releases/download/v5.1.3/bootstrap-5.1.3-dist.zip'
+    BOOTSTRAP_TARGET_NAME = 'bootstrap'
+    __BOOTSTRAP_ZIP_NAME = BOOTSTRAP_LINK.split('/')[-1]
+    __BOOTSTRAP_ORIGINAL_NAME = __BOOTSTRAP_ZIP_NAME.split('.zip')[0]
+
+    def __init__(self):
+        pass
+
+    def initialize_bootstrap(self, override=True):
+        if settings.DEBUG:
+            _path = pathlib.Path(settings.STATIC_URL)
+        else:
+            _path = pathlib.Path(settings.STATIC_ROOT)
+
+        _path = _path / 'lib'
+
+        if not override and (_path / self.BOOTSTRAP_TARGET_NAME).exists():
+            return None
+
+        _cmd = f'wget {self.BOOTSTRAP_LINK} -P {_path}'
+        _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _out, _err = _process.communicate()
+
+        if _process.returncode != 0:
+            raise InitializeBoostrapException(_err.decode('utf-8'))
+
+        _zip_path = _path / self.__BOOTSTRAP_ZIP_NAME
+
+        _cmd = f'7z x {_zip_path} -O./{_path}'
+        _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _out, _err = _process.communicate()
+
+        if _process.returncode != 0:
+            raise InitializeBoostrapException(_err.decode('utf-8'))
+
+        _zip_path.unlink()
+
+        (_path / self.__BOOTSTRAP_ORIGINAL_NAME).rename(_path / self.BOOTSTRAP_TARGET_NAME)
 
 
 class Database:

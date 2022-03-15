@@ -1,5 +1,8 @@
 from django import forms
 from django.db.utils import ProgrammingError
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import AuthenticationForm as DjangoAuthenticationForm
+from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.core.exceptions import ValidationError
@@ -28,20 +31,48 @@ class UserCreationForm(DjangoUserCreationForm):
 
     first_name = forms.CharField(
         max_length=30,
-        required=False
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control'
+        })
     )
     last_name = forms.CharField(
         max_length=30,
-        required=False
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control'
+        })
     )
     server = forms.ChoiceField(
         label='Server',
-        choices=list(SERVER_CHOICES)
+        choices=list(SERVER_CHOICES),
     )
     username = forms.CharField(
         help_text='50 characters or fewer. Low letters only. '
                   'If you leave empty, than username will be default value: email without @server',
-        required=False
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control'
+        })
+    )
+
+    password1 = forms.CharField(
+        label='Password',
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'new-password',
+            'class': 'form-control'
+        }),
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    password2 = forms.CharField(
+        label='Password confirmation',
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'new-password',
+            'class': 'form-control'
+        }),
+        strip=False,
+        help_text='Enter the same password as before, for verification.',
     )
 
     class Meta:
@@ -113,3 +144,18 @@ class ServerForm(forms.ModelForm):
     class Meta:
         model = Server
         fields = '__all__'
+
+
+class AuthenticationForm(DjangoAuthenticationForm):
+    username = UsernameField(widget=forms.TextInput(attrs={
+        'autofocus': True,
+        'class': 'form-control'
+    }))
+    password = forms.CharField(
+        label='Password',
+        strip=False,
+        widget=forms.PasswordInput(attrs={
+            'autocomplete': 'current-password',
+            'class': 'form-control'
+        }),
+    )

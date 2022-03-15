@@ -1,24 +1,92 @@
-{% load static %}
+{% load i18n static %}
 
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap -->
+    <link href="{% static 'lib/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" media="screen">
+    <!-- Django -->
+    <link href="{% static 'admin/css/responsive.css' %}" rel="stylesheet">
+
     <title>{% block title %}{% endblock %}</title>
-    <link href="{% static 'admin/css/base.css' %}" rel="stylesheet">
+
+    <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}"/>
   </head>
   <body>
-    <div id="header">
-      <span class="logo">
-        {% block breadcrumb %}
-          <ul class="breadcrumb">
-            <li><a href="{% url 'index' %}">Kureta</a></li>
-          </ul>
-        {% endblock breadcrumb %}
-      </span>
-    </div>
-    <div id="content">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Kureta</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          {% block breadcrumb %}
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              {% if not user.is_authenticated %}
+                {% with request.resolver_match.url_name as url_name %}
+                  <li class="nav-item">
+                    <a
+                      class="nav-link {% if url_name == 'login' %}active{% endif %}"
+                      aria-current="page"
+                      href="/login/"
+                    >
+                      {% translate 'Sign In' %}
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a
+                      class="nav-link {% if url_name == 'register' %}active{% endif %}"
+                      href="{% url 'register' %}"
+                    >
+                      {% translate 'Sign Up' %}
+                    </a>
+                  </li>
+                {% endwith %}
+              {% endif %}
+            </ul>
+            {% if user.is_authenticated %}
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    {% translate 'Settings' %}
+                  </a>
+                  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+<!--                    <li><a class="dropdown-item" href="mail/settings">{% translate 'Settings' %}</a></li>-->
+<!--                    <li><hr class="dropdown-divider"></li>-->
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">{% translate 'Logout' %}</a></li>
+                  </ul>
+                </li>
+              </ul>
+            {% endif %}
+          {% endblock %}
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
       {% block content %}
       {% endblock %}
     </div>
+
+    <footer class="bg-light text-center text-lg-start mt-auto fixed-bottom">
+      {% block footer %}
+        <div class="text-center p-3">
+          © 2022 Copyright
+        </div>
+      {% endblock %}
+    </footer>
+
+    <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
+    <script src="{% static 'lib/bootstrap/js/bootstrap.min.js' %}"></script>
   </body>
 </html>

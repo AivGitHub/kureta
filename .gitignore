@@ -9,3 +9,4 @@ kureta.egg-info/
 # Project
 .idea/
 secure.py
+static/lib/bootstrap
