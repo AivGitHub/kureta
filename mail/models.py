@@ -5,6 +5,7 @@ from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin)
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 import magic
 
 from mail.managers import UserManager
@@ -14,47 +15,47 @@ _magic = magic.Magic(mime=True)
 
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
-        'username',
+        _('username'),
         max_length=150,
-        help_text='150 characters or fewer. Letters and digits only.',
+        help_text=_('150 characters or fewer. Letters and digits only.'),
         error_messages={
-            'unique': 'A user with that username already exists.',
+            'unique': _('A user with that username already exists.'),
         },
         null=True,
         blank=True,
         unique=True
     )
     first_name = models.CharField(
-        'First name',
+        _('First name'),
         max_length=150,
         null=True,
         blank=True
     )
     last_name = models.CharField(
-        'Last name',
+        _('Last name'),
         max_length=50,
         null=True,
         blank=True
     )
     email = models.EmailField(
-        'Email address',
+        _('Email address'),
         null=False,
         blank=False,
         unique=True
     )
     is_staff = models.BooleanField(
-        'Staff status',
+        _('Staff status'),
         default=False,
-        help_text='Designates whether the user can log into this admin site.',
+        help_text=_('Designates whether the user can log into this admin site.'),
     )
     is_active = models.BooleanField(
-        'Active',
+        _('Active'),
         default=True,
-        help_text='Designates whether this user should be treated as active. '
-                  'Unselect this instead of deleting accounts.',
+        help_text=_('Designates whether this user should be treated as active. '
+                    'Unselect this instead of deleting accounts.'),
     )
     date_joined = models.DateTimeField(
-        'Date joined',
+        _('Date joined'),
         default=timezone.now
     )
 
@@ -64,8 +65,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = []
 
     class Meta:
-        verbose_name = 'User'
-        verbose_name_plural = 'Users'
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
 
     def __str__(self):
         return self.email
@@ -91,26 +92,26 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 class Server(models.Model):
     server = models.CharField(
-        'Server name',
+        _('Server name'),
         max_length=256,
         null=False,
         blank=False,
         unique=True
     )
     port = models.IntegerField(
-        'Port',
+        _('Port'),
         null=False,
         blank=False,
         default=587
     )
     ssl = models.BooleanField(
-        'SSL',
+        _('SSL'),
         default=False
     )
 
     class Meta:
-        verbose_name = 'Server'
-        verbose_name_plural = 'Servers'
+        verbose_name = _('Server')
+        verbose_name_plural = _('Servers')
 
     def __str__(self) -> str:
         return self.server
@@ -118,13 +119,13 @@ class Server(models.Model):
 
 class Message(models.Model):
     subject = models.CharField(
-        'Subject',
+        _('Subject'),
         max_length=512,
         null=True,
         blank=True
     )
     body = models.TextField(
-        'Text body',
+        _('Text body'),
         null=True,
         blank=True
     )
@@ -133,14 +134,14 @@ class Message(models.Model):
         on_delete=models.CASCADE
     )
     recipients = models.TextField(
-        'Recipients',
+        _('Recipients'),
         null=False,
         blank=False
     )
 
     class Meta:
-        verbose_name = 'Message'
-        verbose_name_plural = 'Messages'
+        verbose_name = _('Message')
+        verbose_name_plural = _('Messages')
 
     def __str__(self) -> str:
         return str(self.pk)
@@ -151,37 +152,37 @@ class Attachment(models.Model):
         upload_to='%Y/%m/%d'
     )
     path = models.CharField(
-        'path',
+        _('Path'),
         max_length=512,
         null=False,
         blank=False,
     )
     mime_type = models.CharField(
-        'Mime type',
+        _('Mime type'),
         max_length=128,
         null=False,
         blank=False
     )
     name = models.CharField(
-        'Name',
+        _('Name'),
         max_length=128,
         null=True,
         blank=True
     )
     extension = models.CharField(
-        'Mime type',
+        _('Mime type'),
         max_length=128,
         null=False,
         blank=False
     )
     md5 = models.CharField(
-        'MD5',
+        _('MD5'),
         max_length=32,
         null=False,
         blank=False
     )
     encrypted = models.BooleanField(
-        'Encrypted',
+        _('Encrypted'),
         default=False
     )
     message = models.ForeignKey(
@@ -192,8 +193,8 @@ class Attachment(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Attachment'
-        verbose_name_plural = 'Attachments'
+        verbose_name = _('Attachment')
+        verbose_name_plural = _('Attachments')
 
     def __str__(self) -> str:
         return self.path

@@ -148,9 +148,9 @@ class ServerForm(forms.ModelForm):
 
 
 class AuthenticationForm(DjangoAuthenticationForm):
-    username = UsernameField(widget=forms.TextInput(attrs={
-        'autofocus': True,
-    }))
+    username = UsernameField(
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
     password = forms.CharField(
         label='Password',
         strip=False,
@@ -162,6 +162,6 @@ class AuthenticationForm(DjangoAuthenticationForm):
     def get_invalid_login_error(self):
         return ValidationError(
             _('Please enter a correct %(username)s and password.'),
-            code="invalid_login",
-            params={"username": self.username_field.verbose_name},
+            code='invalid_login',
+            params={'username': self.username_field.verbose_name},
         )

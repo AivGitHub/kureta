@@ -9,7 +9,6 @@ from mail.models import Server
 
 @admin.register(Server)
 class ServerAdmin(admin.ModelAdmin):
-
     form = ServerForm
 
     def has_delete_permission(self, request, obj=None) -> bool:
