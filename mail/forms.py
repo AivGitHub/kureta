@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from mail.models import (
     Server, User
@@ -48,8 +49,8 @@ class UserCreationForm(DjangoUserCreationForm):
         choices=list(SERVER_CHOICES),
     )
     username = forms.CharField(
-        help_text='50 characters or fewer. Low letters only. '
-                  'If you leave empty, than username will be default value: email without @server',
+        help_text=_('50 characters or fewer. Low letters only '
+                    'If you leave empty, than username will be default value: email without @server'),
         required=False,
         widget=forms.TextInput(attrs={
             'class': 'form-control'
@@ -72,7 +73,7 @@ class UserCreationForm(DjangoUserCreationForm):
             'class': 'form-control'
         }),
         strip=False,
-        help_text='Enter the same password as before, for verification.',
+        help_text=_('Enter the same password as before, for verification.'),
     )
 
     class Meta:
@@ -89,7 +90,7 @@ class UserCreationForm(DjangoUserCreationForm):
 
         if _email_server not in __allowed_servers_list:
             raise ValidationError(
-                f'Server should be of the: `{", ".join(__allowed_servers_list)}`. Not `{_email_server}`.')
+                _(f'Server should be of the: `{", ".join(__allowed_servers_list)}`. Not `{_email_server}`.'))
 
         return _email
 
@@ -100,13 +101,13 @@ class UserCreationForm(DjangoUserCreationForm):
             return _username
 
         if not _username.isalpha():
-            raise ValidationError('Username can be letters only.')
+            raise ValidationError(_('Username can be letters only.'))
 
         if not _username.islower():
-            raise ValidationError('Username can be lower only.')
+            raise ValidationError(_('Username can be lower only.'))
 
         if _username and len(_username.split()) != 1:
-            raise ValidationError('Username can\'t contain empty symbols.')
+            raise ValidationError(_('Username can\'t contain empty symbols.'))
 
         return _username
 
@@ -149,13 +150,18 @@ class ServerForm(forms.ModelForm):
 class AuthenticationForm(DjangoAuthenticationForm):
     username = UsernameField(widget=forms.TextInput(attrs={
         'autofocus': True,
-        'class': 'form-control'
     }))
     password = forms.CharField(
         label='Password',
         strip=False,
         widget=forms.PasswordInput(attrs={
             'autocomplete': 'current-password',
-            'class': 'form-control'
         }),
     )
+
+    def get_invalid_login_error(self):
+        return ValidationError(
+            _('Please enter a correct %(username)s and password.'),
+            code="invalid_login",
+            params={"username": self.username_field.verbose_name},
+        )

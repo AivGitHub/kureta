@@ -1,6 +1,9 @@
 from django.core.management.base import BaseCommand
 
-from kureta.utils import Database, Static
+from kureta.utils import (
+    Database,
+    Static
+)
 
 
 class Command(BaseCommand):
@@ -23,4 +26,4 @@ class Command(BaseCommand):
         _database.initialize()
 
         _static = Static()
-        _static.initialize_bootstrap()
+        _static.initialize()

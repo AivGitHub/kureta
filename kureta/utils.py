@@ -17,44 +17,78 @@ import settings
 
 class Static:
 
-    BOOTSTRAP_LINK = 'https://github.com/twbs/bootstrap/releases/download/v5.1.3/bootstrap-5.1.3-dist.zip'
-    BOOTSTRAP_TARGET_NAME = 'bootstrap'
-    __BOOTSTRAP_ZIP_NAME = BOOTSTRAP_LINK.split('/')[-1]
-    __BOOTSTRAP_ORIGINAL_NAME = __BOOTSTRAP_ZIP_NAME.split('.zip')[0]
+    FILES = (
+        {
+            'target_name': 'bootstrap',
+            'link': 'https://github.com/twbs/bootstrap/releases/download/v5.1.3/bootstrap-5.1.3-dist.zip'
+        },
+        {
+            'target_name': 'fontawesome',
+            'link': 'https://use.fontawesome.com/releases/v6.0.0/fontawesome-free-6.0.0-web.zip'
+        }
+    )
 
     def __init__(self):
         pass
 
-    def initialize_bootstrap(self, override=True):
+    @staticmethod
+    def download_file(file_name, path):
+        _cmd = f'wget {file_name} -P {path}'
+        _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _out, _err = _process.communicate()
+
+        if _process.returncode != 0:
+            raise InitializeBoostrapException(_err.decode('utf-8'))
+
+    @staticmethod
+    def extract_file(zip_path, path):
+        _cmd = f'7z x {zip_path} -O./{path}'
+        _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        _out, _err = _process.communicate()
+
+        if _process.returncode != 0:
+            raise InitializeBoostrapException(_err.decode('utf-8'))
+
+    def initialize(self, files=None, override=True):
+        if not files:
+            files = self.FILES
+
         if settings.DEBUG:
-            _path = pathlib.Path(settings.STATIC_URL)
+            _lib_path = pathlib.Path(settings.STATIC_URL)
         else:
-            _path = pathlib.Path(settings.STATIC_ROOT)
+            _lib_path = pathlib.Path(settings.STATIC_ROOT)
 
-        _path = _path / 'lib'
+        _lib_path = _lib_path / 'external_lib'
+        _lib_path.mkdir(parents=True, exist_ok=True)
 
-        if not override and (_path / self.BOOTSTRAP_TARGET_NAME).exists():
-            return None
+        for _file in files:
+            __target_name = _file.get('target_name')
 
-        _cmd = f'wget {self.BOOTSTRAP_LINK} -P {_path}'
-        _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        _out, _err = _process.communicate()
+            if not override and (_lib_path / __target_name).exists():
+                return None
 
-        if _process.returncode != 0:
-            raise InitializeBoostrapException(_err.decode('utf-8'))
+            __link = _file.get('link')
+            __zip_name = __link.split('/')[-1]
+            __original_name = __zip_name.split('.zip')[0]
 
-        _zip_path = _path / self.__BOOTSTRAP_ZIP_NAME
+            __zip_path = _lib_path / __zip_name
 
-        _cmd = f'7z x {_zip_path} -O./{_path}'
-        _process = subprocess.Popen(_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        _out, _err = _process.communicate()
+            Static.download_file(__link, _lib_path)
+            Static.extract_file(__zip_path, _lib_path)
 
-        if _process.returncode != 0:
-            raise InitializeBoostrapException(_err.decode('utf-8'))
+            __zip_path.unlink()
 
-        _zip_path.unlink()
+            (_lib_path / __original_name).rename(_lib_path / __target_name)
 
-        (_path / self.__BOOTSTRAP_ORIGINAL_NAME).rename(_path / self.BOOTSTRAP_TARGET_NAME)
+    def initialize_bootstrap(self, override=True):
+        _file = tuple(f for f in self.FILES if f.get('target_name') == 'bootstrap')
+
+        self.initialize(files=_file, override=override)
+
+    def initialize_fontawesome(self, override=True):
+        _file = tuple(f for f in self.FILES if f.get('target_name') == 'fontawesome')
+
+        self.initialize(files=_file, override=override)
 
 
 class Database:
