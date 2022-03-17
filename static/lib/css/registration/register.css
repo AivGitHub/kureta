@@ -27,6 +27,15 @@
   color: #4343ff;
 }
 
+select {
+  border: none;
+  border-left: 1px solid #ddd;
+  background-color: #fff;
+  outline: none;
+  cursor: pointer;
+}
+
+input[type='email'],
 input[type='text'],
 input[type='password'] {
   border: none;

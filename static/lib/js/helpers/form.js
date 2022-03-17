@@ -1,4 +1,11 @@
 $(document).ready(function() {
+  try {
+    var idUsername = $('#id_username');
+    if (idUsername.val().includes('@')) {
+      idUsername.next().addClass('d-none');
+    }
+  } catch {}
+
   $('.fa-eye-toggle').on('click', function(event){
     var parent = $(this).parent();
     var input = parent.children('input');
@@ -12,6 +19,17 @@ $(document).ready(function() {
       farSpan.removeClass('fa-eye-slash');
       farSpan.addClass('fa-eye');
       input.attr('type', 'text');
+    }
+  });
+
+  $('#id_username').on('input', function(){
+    var val = $(this).val();
+    var parentServer = $(this).next();
+
+    if (val.includes('@')) {
+      parentServer.addClass('d-none');
+    } else {
+      parentServer.removeClass('d-none');
     }
   });
 });

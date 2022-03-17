@@ -3,6 +3,7 @@ import pathlib
 
 from django.contrib.auth.models import (AbstractBaseUser, PermissionsMixin)
 from django.core.mail import send_mail
+from django.core.validators import EmailValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -16,13 +17,14 @@ _magic = magic.Magic(mime=True)
 class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(
         _('username'),
-        max_length=150,
+        validators=[EmailValidator(message=_("Enter a valid username."))],
+        max_length=254,
         help_text=_('150 characters or fewer. Letters and digits only.'),
         error_messages={
             'unique': _('A user with that username already exists.'),
         },
-        null=True,
-        blank=True,
+        null=False,
+        blank=False,
         unique=True
     )
     first_name = models.CharField(
@@ -39,9 +41,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     email = models.EmailField(
         _('Email address'),
-        null=False,
-        blank=False,
-        unique=True
+        max_length=254,
+        null=True,
+        blank=True,
+        unique=False
     )
     is_staff = models.BooleanField(
         _('Staff status'),
@@ -61,37 +64,38 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
-    USERNAME_FIELD = 'email'
+    EMAIL_FIELD = 'email'
+    USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
 
     class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
 
-    def __str__(self):
-        return self.email
+    def __str__(self) -> str:
+        return self.username
 
-    def clean(self):
+    def clean(self) -> None:
         super().clean()
         self.email = self.__class__.objects.normalize_email(self.email)
 
-    def get_server(self):
-        return self.email.split('@')[1]
+    def get_domain(self) -> str:
+        return self.username.split('@')[1]
 
-    def get_full_name(self):
+    def get_full_name(self) -> str:
         full_name = f'{self.first_name} {self.last_name}'
 
         return full_name.strip()
 
-    def get_short_name(self):
+    def get_short_name(self) -> str:
         return self.first_name
 
-    def email_user(self, subject, message, from_email=None, **kwargs):
+    def email_user(self, subject, message, from_email=None, **kwargs) -> None:
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
 class Server(models.Model):
-    server = models.CharField(
+    name = models.CharField(
         _('Server name'),
         max_length=256,
         null=False,

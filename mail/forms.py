@@ -1,11 +1,11 @@
 from django import forms
-from django.db.utils import ProgrammingError
-from django.contrib.auth import password_validation
+from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.forms import AuthenticationForm as DjangoAuthenticationForm
 from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
 from django.core.exceptions import ValidationError
+from django.db.utils import ProgrammingError
 from django.utils.translation import gettext_lazy as _
 
 from mail.models import (
@@ -15,7 +15,7 @@ import settings
 
 
 class UserCreationForm(DjangoUserCreationForm):
-    SERVER_CHOICES = (
+    DOMAIN_CHOICES = (
         (f'{settings.PROJECT_NAME}.com', f'{settings.PROJECT_NAME}.com'),
     )
 
@@ -24,108 +24,98 @@ class UserCreationForm(DjangoUserCreationForm):
         __servers = Server.objects.all()
 
         if len(__servers):
-            SERVER_CHOICES = ((val, val) for val in __servers)
+            DOMAIN_CHOICES = tuple((_server.name, _server.name) for _server in __servers)
     except ProgrammingError:
         pass
 
-    ALLOWED_SERVERS = (__choice[0] for __choice in SERVER_CHOICES)
-
+    username = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': _('Username')
+            }
+        )
+    )
     first_name = forms.CharField(
         max_length=30,
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control'
-        })
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': _('First Name')
+            }
+        )
     )
     last_name = forms.CharField(
         max_length=30,
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control'
-        })
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': _('Last Name')
+            }
+        )
     )
-    server = forms.ChoiceField(
-        label='Server',
-        choices=list(SERVER_CHOICES),
-    )
-    username = forms.CharField(
-        help_text=_('50 characters or fewer. Low letters only '
-                    'If you leave empty, than username will be default value: email without @server'),
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control'
-        })
-    )
-
     password1 = forms.CharField(
         label='Password',
         strip=False,
-        widget=forms.PasswordInput(attrs={
-            'autocomplete': 'new-password',
-            'class': 'form-control'
-        }),
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': _('Password')
+            }
+        ),
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label='Password confirmation',
-        widget=forms.PasswordInput(attrs={
-            'autocomplete': 'new-password',
-            'class': 'form-control'
-        }),
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': _('Password verification')
+            }
+        ),
         strip=False,
         help_text=_('Enter the same password as before, for verification.'),
+    )
+    domain = forms.ChoiceField(
+        label=_('Domain'),
+        choices=DOMAIN_CHOICES,
     )
 
     class Meta:
         model = User
-        fields = ('email', 'server', 'first_name', 'last_name', 'password1', 'password2')
-        widgets = {
-            'email': forms.TextInput(),
-        }
-
-    def clean_email(self):
-        __allowed_servers_list = list(self.ALLOWED_SERVERS)
-        _email = self.cleaned_data.get('email')
-        _email_server = _email.split('@')[1]
-
-        if _email_server not in __allowed_servers_list:
-            raise ValidationError(
-                _(f'Server should be of the: `{", ".join(__allowed_servers_list)}`. Not `{_email_server}`.'))
-
-        return _email
+        fields = ('username', 'domain', 'password1', 'password2', 'first_name', 'last_name')
+        widgets = {}
 
     def clean_username(self):
+        """ TODO: classify input errors
+        """
         _username = self.cleaned_data.get('username')
+        _allowed_domains = tuple(__domain[0] for __domain in self.DOMAIN_CHOICES)
 
-        if not _username:
+        if '@' not in _username:
             return _username
 
-        if not _username.isalpha():
-            raise ValidationError(_('Username can be letters only.'))
+        _domain = _username.split('@')[-1]
 
-        if not _username.islower():
-            raise ValidationError(_('Username can be lower only.'))
-
-        if _username and len(_username.split()) != 1:
-            raise ValidationError(_('Username can\'t contain empty symbols.'))
+        if _domain not in _allowed_domains:
+            raise ValidationError(f'Domain should be one of the: `{", ".join(_allowed_domains)}`.')
 
         return _username
 
     def clean(self):
-        cleaned_data = super().clean()
+        _cleaned_data = super().clean()
+        _username = _cleaned_data.get('username')
 
-        return cleaned_data
+        if _username and '@' not in _username:
+            __domain = self.cleaned_data.get('domain')
+
+            _cleaned_data.update({'username': f'{_username}@{__domain}'})
+
+        return _cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
 
-        _email = self.cleaned_data.get('email')
-        _username = self.cleaned_data.get('username')
-
-        if not _username.strip():
-            _username = _email.split('@')[0]
-
-        user.username = _username
+        user.email = self.cleaned_data.get('username')
 
         if commit:
             user.save()
@@ -148,15 +138,40 @@ class ServerForm(forms.ModelForm):
 
 
 class AuthenticationForm(DjangoAuthenticationForm):
+    DOMAIN_CHOICES = (
+        (f'{settings.PROJECT_NAME}.com', f'{settings.PROJECT_NAME}.com'),
+    )
+
+    try:
+        # Hack for migrations
+        __servers = Server.objects.all()
+
+        if len(__servers):
+            DOMAIN_CHOICES = tuple((_server.name, _server.name) for _server in __servers)
+    except ProgrammingError:
+        pass
+
     username = UsernameField(
-        widget=forms.TextInput(attrs={'autofocus': True})
+        widget=forms.TextInput(
+            attrs={
+                'autofocus': True,
+                'placeholder': _('Email')
+            }
+        )
     )
     password = forms.CharField(
         label='Password',
         strip=False,
-        widget=forms.PasswordInput(attrs={
-            'autocomplete': 'current-password',
-        }),
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'current-password',
+                'placeholder': _('Password')
+            }
+        ),
+    )
+    domain = forms.ChoiceField(
+        label=_('Domain'),
+        choices=DOMAIN_CHOICES,
     )
 
     def get_invalid_login_error(self):
@@ -165,3 +180,22 @@ class AuthenticationForm(DjangoAuthenticationForm):
             code='invalid_login',
             params={'username': self.username_field.verbose_name},
         )
+
+    def clean(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password')
+        domain = self.cleaned_data.get('domain')
+
+        if username and '@' not in username:
+            username = f'{username}@{domain}'
+
+        if username is not None and password:
+            self.user_cache = authenticate(
+                self.request, username=username, password=password
+            )
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data

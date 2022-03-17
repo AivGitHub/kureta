@@ -3,7 +3,11 @@
 {% load i18n static helpers %}
 
 {% block extra_style %}
-  <link href="{% static 'lib/css/login.css' %}?{% get_setting_value 'PROJECT_VERSION' %}" rel="stylesheet" media="screen">
+  <link
+    href="{% static 'lib/css/registration/login.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    rel="stylesheet"
+    media="screen"
+  >
 {% endblock %}
 
 {% block title %}{% translate 'Login' %}{% endblock %}
@@ -28,12 +32,15 @@
               <div class="form-group py-2">
                 <div class="input-field">
                   <span class="far fa-user p-2"></span>
-                   {{ form.username }}
+                    {{ form.username }}
+                    <div class="btn bg-white text-muted fa-eye-toggle">
+                      {{ form.domain }}
+                    </div>
                 </div>
               </div>
               <div class="form-group py-1 pb-2">
                 <div class="input-field">
-                  <span class="fas fa-lock px-2"></span>
+                  <span class="fa fa-lock px-2"></span>
                   {{ form.password }}
                     <div class="btn bg-white text-muted fa-eye-toggle">
                       <span class="far fa-eye-slash"></span>
@@ -48,7 +55,7 @@
                   {% translate 'Now you can Sign In' %}
                 {% else %}
                   {% translate 'Don\'t have an account?' %}
-                  <a class="text-decoration-none" href="{% url 'register' %}">{% translate 'Sign up' %}</a>
+                  <a class="text-decoration-none" href="{% url 'register' %}">{% translate 'Sign Up' %}</a>
                 {% endif %}
               </div>
             </form>

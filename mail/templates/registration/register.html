@@ -1,30 +1,89 @@
 {% extends 'base.html' %}
 
-{% load i18n %}
+{% load i18n static helpers %}
 
-{% block title %}{% translate 'Register' %}{% endblock %}
+{% block extra_style %}
+  <link
+    href="{% static 'lib/css/registration/register.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    rel="stylesheet"
+    media="screen"
+  >
+{% endblock %}
+
+{% block title %}{% translate 'Sign Up' %}{% endblock %}
+
+{% block parent_navbar %}
+{% endblock %}
 
 {% block content %}
-  <h2>Sign up</h2>
-  {% translate 'Have an account?' %}
-  <a class="text-decoration-none" href="/login/">{% translate 'Sign in!' %}</a>
-  <hr>
-  <form method="post">
-    {% csrf_token %}
-    {% for field in form %}
-      <div class="mb-3">
-        <p>
-          <label class="form-label" for="{{ field.auto_id }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.help_text %}
-            <small style="color: grey">{{ field.help_text }}</small>
-          {% endif %}
-          {% for error in field.errors %}
-            <p style="color: red">{{ error }}</p>
-          {% endfor %}
-        </p>
+
+
+  <div class="container">
+    <div class="row">
+      <div class="offset-md-2 col-lg-5 col-md-7 offset-lg-4 offset-md-3">
+        <div class="panel border bg-white">
+          <div class="panel-header">
+            <h3 class="pt-3 font-weight-bold">{% translate 'Sign Up' %}</h3>
+          </div>
+
+          <div class="panel-body p-3">
+            <form method="POST">
+              {% csrf_token %}
+
+              {% for field in form %}
+                {% if field.name == 'domain' %}
+                  <!-- `username` field uses `domain`. So skip it. -->
+                {% elif field.name == 'username' %}
+                  <div class="form-group py-2">
+                    <div class="input-field">
+                      <span class="fa fa-user p-2"></span>
+                      {{ field }}
+                      <div class="bg-white text-muted fa-eye-toggle">
+                        {{ form.domain }}
+                      </div>
+                    </div>
+                  </div>
+                {% elif field.name == 'password1' or field.name == 'password2' %}
+                  <div class="form-group py-2">
+                    <div class="input-field">
+                      <span class="fa fa-lock px-2"></span>
+                      {{ field }}
+                      <div class="btn bg-white text-muted fa-eye-toggle">
+                        <span class="fa fa-eye-slash"></span>
+                      </div>
+                    </div>
+                  </div>
+                {% else %}
+                  <div class="form-group py-2">
+                    <div class="input-field">
+                      <span class="fa fa-user p-2"></span>
+                      {{ field }}
+                    </div>
+                  </div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                  <p style="color: red">{{ error }}</p>
+                {% endfor %}
+
+              {% endfor %}
+
+              <button class="btn btn-primary btn-block mt-3">
+                {% translate 'Sign Up' %}
+              </button>
+
+              <div class="text-center pt-4 text-muted">
+                {% translate 'Have an account?' %}
+                <a class="text-decoration-none" href="{% url 'login' %}">{% translate 'Sign In' %}</a>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-    {% endfor %}
-    <button type="submit" class="btn btn-primary">{% translate 'Sign Up' %}</button>
-  </form>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_script %}
+  <script src="{% static 'lib/js/helpers/form.js' %}?{% get_setting_value 'PROJECT_VERSION' %}"></script>
 {% endblock %}
