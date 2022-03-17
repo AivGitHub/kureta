@@ -65,7 +65,7 @@ class UserCreationForm(DjangoUserCreationForm):
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
-        label='Password confirmation',
+        label=_('Password confirmation'),
         widget=forms.PasswordInput(
             attrs={
                 'autocomplete': 'new-password',
