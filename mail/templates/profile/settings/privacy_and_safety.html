@@ -1,0 +1,54 @@
+{% extends 'profile/settings/settings.html' %}
+
+{% load i18n static helpers %}
+
+{% block extra_style %}
+  <link
+    href="{% static 'lib/css/profile/settings/settings.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    rel="stylesheet"
+    media="screen"
+  >
+{% endblock %}
+
+{% block title %}{% translate 'Settings' %}{% endblock %}
+
+{% block settings_content %}
+  {% if form.is_valid %}
+    <p class="text-success"> {% translate 'Password successfully changed' %}</p>
+  {% elif form.errors %}
+    <p class="errornote">
+      {% if form.errors.items|length == 1 %}
+        {% translate "Please correct the error below." %}
+      {% else %}
+        {% translate "Please correct the errors below." %}
+      {% endif %}
+    </p>
+  {% else %}
+    <p> {% translate 'Enter a new password' %}</p>
+  {% endif %}
+  <form method="POST">
+    <input type="hidden" name="form_name" value="change_password">
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="form-group py-2">
+        <div class="input-field">
+          <span class="fa fa-lock px-2"></span>
+          {{ field }}
+          <div class="btn bg-white text-muted fa-eye-toggle">
+            <span class="fa fa-eye-slash"></span>
+          </div>
+        </div>
+        {% for error in field.errors %}
+          <p class="text-danger">{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary btn-block mt-3">
+      {% translate 'Save' %}
+    </button>
+  </form>
+{% endblock %}
+
+{% block extra_script %}
+  <script src="{% static 'lib/js/helpers/form.js' %}?{% get_setting_value 'PROJECT_VERSION' %}"></script>
+{% endblock %}

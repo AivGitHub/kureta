@@ -61,6 +61,18 @@ class User(AbstractBaseUser, PermissionsMixin):
         _('Date joined'),
         default=timezone.now
     )
+    nick = models.CharField(
+        _('username'),
+        # validators=[EmailValidator(message=_("Enter a valid username."))],
+        max_length=254,
+        help_text=_('150 characters or fewer. Letters and digits only.'),
+        error_messages={
+            'unique': _('A user with that username already exists.'),
+        },
+        null=False,
+        blank=False,
+        unique=True
+    )
 
     objects = UserManager()
 

@@ -1,3 +1,4 @@
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.core.paginator import Paginator
@@ -5,7 +6,11 @@ from django.shortcuts import render, redirect
 from django.views import View
 
 from mail.models import Message
-from mail.forms import UserCreationForm
+from mail.forms import (
+    MainSettingsForm,
+    PasswordChangeForm,
+    UserCreationForm
+)
 
 
 class RegisterView(View):
@@ -46,6 +51,18 @@ class LoginView(DjangoLoginView):
         return super().get(self, request, *args, **kwargs)
 
 
+class Feed(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            'profile/feed.html',
+            {
+            }
+        )
+
+
 class Profile(LoginRequiredMixin, View):
     login_url = '/login/'
 
@@ -70,16 +87,51 @@ class Profile(LoginRequiredMixin, View):
         )
 
 
-class Feed(LoginRequiredMixin, View):
+class ProfileSettings(LoginRequiredMixin, View):
     login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         return render(
             request,
-            'profile/feed.html',
+            'profile/settings/profile.html',
             {
             }
         )
+
+
+class PrivacyAndSafety(LoginRequiredMixin, View):
+    """
+    Careful: PasswordChangeForm need user in first argument.
+    """
+    login_url = '/login/'
+    privacy_and_safety_template = 'profile/settings/privacy_and_safety.html'
+
+    def get(self, request, *args, **kwargs):
+        change_password_form = PasswordChangeForm(request.user)
+
+        return render(
+            request,
+            self.privacy_and_safety_template,
+            {
+                'form': change_password_form
+            }
+        )
+
+    def post(self, request, *args, **kwargs):
+        change_password_form = PasswordChangeForm(request.user, request.POST)
+
+        if change_password_form.is_valid():
+            change_password_form.save()
+            update_session_auth_hash(request, change_password_form.user)
+
+        return render(
+            request,
+            self.privacy_and_safety_template,
+            {
+                'form': change_password_form
+            }
+        )
+
 
 
 class ErrorHandler404(View):

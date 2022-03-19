@@ -16,8 +16,6 @@
 {% endblock %}
 
 {% block content %}
-
-
   <div class="container">
     <div class="row">
       <div class="offset-md-2 col-lg-5 col-md-7 offset-lg-4 offset-md-3">
@@ -25,11 +23,9 @@
           <div class="panel-header">
             <h3 class="pt-3 font-weight-bold">{% translate 'Sign Up' %}</h3>
           </div>
-
           <div class="panel-body p-3">
             <form method="POST">
               {% csrf_token %}
-
               {% for field in form %}
                 {% if field.name == 'domain' %}
                   <!-- `username` field uses `domain`. So skip it. -->
@@ -61,17 +57,13 @@
                     </div>
                   </div>
                 {% endif %}
-
                 {% for error in field.errors %}
-                  <p style="color: red">{{ error }}</p>
+                  <p class="text-danger">{{ error }}</p>
                 {% endfor %}
-
               {% endfor %}
-
               <button class="btn btn-primary btn-block mt-3">
                 {% translate 'Sign Up' %}
               </button>
-
               <div class="text-center pt-4 text-muted">
                 {% translate 'Have an account?' %}
                 <a class="text-decoration-none" href="{% url 'login' %}">{% translate 'Sign In' %}</a>

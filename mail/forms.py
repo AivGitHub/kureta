@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import authenticate, password_validation
 from django.contrib.auth.forms import AuthenticationForm as DjangoAuthenticationForm
+from django.contrib.auth.forms import PasswordChangeForm as DjangoPasswordChangeForm
 from django.contrib.auth.forms import UsernameField
 from django.contrib.auth.forms import UserCreationForm as DjangoUserCreationForm
 from django.contrib.auth.forms import UserChangeForm as DjangoUserChangeForm
@@ -16,7 +17,7 @@ import settings
 
 class UserCreationForm(DjangoUserCreationForm):
     DOMAIN_CHOICES = (
-        (f'{settings.PROJECT_NAME}.com', f'{settings.PROJECT_NAME}.com'),
+        (f'@{settings.PROJECT_NAME}.com', f'@{settings.PROJECT_NAME}.com'),
     )
 
     try:
@@ -24,7 +25,7 @@ class UserCreationForm(DjangoUserCreationForm):
         __servers = Server.objects.all()
 
         if len(__servers):
-            DOMAIN_CHOICES = tuple((_server.name, _server.name) for _server in __servers)
+            DOMAIN_CHOICES = tuple((f'@{_server.name}', f'@{_server.name}') for _server in __servers)
     except ProgrammingError:
         pass
 
@@ -54,7 +55,7 @@ class UserCreationForm(DjangoUserCreationForm):
         )
     )
     password1 = forms.CharField(
-        label='Password',
+        label=_('Password'),
         strip=False,
         widget=forms.PasswordInput(
             attrs={
@@ -108,14 +109,17 @@ class UserCreationForm(DjangoUserCreationForm):
         if _username and '@' not in _username:
             __domain = self.cleaned_data.get('domain')
 
-            _cleaned_data.update({'username': f'{_username}@{__domain}'})
+            _cleaned_data.update({'username': f'{_username}{__domain}'})
 
         return _cleaned_data
 
     def save(self, commit=True):
         user = super().save(commit=False)
 
-        user.email = self.cleaned_data.get('username')
+        _username = self.cleaned_data.get('username')
+
+        user.email = _username
+        user.nick = _username.split('@')[0]
 
         if commit:
             user.save()
@@ -123,11 +127,67 @@ class UserCreationForm(DjangoUserCreationForm):
         return user
 
 
+class PasswordChangeForm(DjangoPasswordChangeForm):
+    old_password = forms.CharField(
+        label=_('Old password'),
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'current-password',
+                'autofocus': True,
+                'placeholder': _('Old password')
+            }
+        ),
+    )
+    new_password1 = forms.CharField(
+        label=_('New password'),
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': _('New password')
+            }
+        ),
+        strip=False,
+        help_text=password_validation.password_validators_help_text_html(),
+    )
+    new_password2 = forms.CharField(
+        label=_('Password confirmation'),
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': _('Password confirmation')
+            }
+        ),
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'old_password', 'new_password1', 'new_password_2')
+
+
+class MainSettingsForm(forms.ModelForm):
+    nick = forms.CharField(
+        max_length=30,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': _('Nick name')
+            }
+        )
+    )
+
+    class Meta:
+        model = User
+        fields = ('nick',)
+        exclude = ()
+
+
 class UserChangeForm(DjangoUserChangeForm):
 
     class Meta:
         model = User
-        fields = ('email',)
+        fields = '__all__'
 
 
 class ServerForm(forms.ModelForm):
@@ -139,7 +199,7 @@ class ServerForm(forms.ModelForm):
 
 class AuthenticationForm(DjangoAuthenticationForm):
     DOMAIN_CHOICES = (
-        (f'{settings.PROJECT_NAME}.com', f'{settings.PROJECT_NAME}.com'),
+        (f'@{settings.PROJECT_NAME}.com', f'@{settings.PROJECT_NAME}.com'),
     )
 
     try:
@@ -160,7 +220,7 @@ class AuthenticationForm(DjangoAuthenticationForm):
         )
     )
     password = forms.CharField(
-        label='Password',
+        label=_('Password'),
         strip=False,
         widget=forms.PasswordInput(
             attrs={
@@ -187,7 +247,7 @@ class AuthenticationForm(DjangoAuthenticationForm):
         domain = self.cleaned_data.get('domain')
 
         if username and '@' not in username:
-            username = f'{username}@{domain}'
+            username = f'{username}{domain}'
 
         if username is not None and password:
             self.user_cache = authenticate(
