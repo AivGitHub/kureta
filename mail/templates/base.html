@@ -70,6 +70,8 @@
                     </li>
                   {% endwith %}
                 {% endif %}
+                {% block extra_breadcrumb %}
+                {% endblock %}
               </ul>
               {% if user.is_authenticated %}
                 <ul class="navbar-nav ms-auto">

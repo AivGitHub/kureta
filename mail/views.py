@@ -133,7 +133,6 @@ class PrivacyAndSafety(LoginRequiredMixin, View):
         )
 
 
-
 class ErrorHandler404(View):
 
     def get(self, request, *args, **kwargs):
