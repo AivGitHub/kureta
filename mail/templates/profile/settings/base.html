@@ -12,18 +12,6 @@
 
 {% block title %}{% translate 'Settings' %}{% endblock %}
 
-{% block extra_breadcrumb %}
-  <li class="nav-item">
-    <a
-      class="nav-link {% if url_name == 'login' %}active{% endif %}"
-      aria-current="page"
-      href="/"
-    >
-      {% translate 'Feed' %}
-    </a>
-  </li>
-{% endblock %}
-
 {% block content %}
   <div class="container">
     <div class="row gutters">

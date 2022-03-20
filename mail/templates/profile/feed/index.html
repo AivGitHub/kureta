@@ -1,0 +1,5 @@
+{% extends 'profile/feed/base.html' %}
+
+{% block feed_content %}
+  Username: <a href="{% url 'mail:profile' %}">{{ user }}</a>
+{% endblock %}

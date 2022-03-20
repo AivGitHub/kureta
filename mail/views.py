@@ -7,7 +7,6 @@ from django.views import View
 
 from mail.models import Message
 from mail.forms import (
-    MainSettingsForm,
     PasswordChangeForm,
     UserCreationForm
 )
@@ -57,7 +56,7 @@ class Feed(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         return render(
             request,
-            'profile/feed.html',
+            'profile/feed/index.html',
             {
             }
         )

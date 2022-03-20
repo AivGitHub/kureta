@@ -166,23 +166,6 @@ class PasswordChangeForm(DjangoPasswordChangeForm):
         fields = ('username', 'old_password', 'new_password1', 'new_password_2')
 
 
-class MainSettingsForm(forms.ModelForm):
-    nick = forms.CharField(
-        max_length=30,
-        required=False,
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': _('Nick name')
-            }
-        )
-    )
-
-    class Meta:
-        model = User
-        fields = ('nick',)
-        exclude = ()
-
-
 class UserChangeForm(DjangoUserChangeForm):
 
     class Meta:

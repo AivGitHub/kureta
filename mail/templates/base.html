@@ -55,7 +55,7 @@
                       <a
                         class="nav-link {% if url_name == 'login' %}active{% endif %}"
                         aria-current="page"
-                        href="/login/"
+                        href="{% url 'login' %}"
                       >
                         {% translate 'Sign In' %}
                       </a>
@@ -69,6 +69,26 @@
                       </a>
                     </li>
                   {% endwith %}
+                {% else %}
+                  {% with request.resolver_match.url_name as url_name %}
+                    <li class="nav-item">
+                      <a
+                        class="nav-link {% if url_name == 'feed' %}active{% endif %}"
+                        aria-current="page"
+                        href="{% url 'mail:feed' %}"
+                      >
+                        {% translate 'Feed' %}
+                      </a>
+                    </li>
+                    <li class="nav-item">
+                      <a
+                        class="nav-link {% if url_name == 'profile' %}active{% endif %}"
+                        href="{% url 'mail:profile' %}"
+                      >
+                        {% translate 'Profile' %}
+                      </a>
+                    </li>
+                  {% endwith %}
                 {% endif %}
                 {% block extra_breadcrumb %}
                 {% endblock %}
@@ -76,13 +96,29 @@
               {% if user.is_authenticated %}
                 <ul class="navbar-nav ms-auto">
                   <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <a
+                      class="nav-link dropdown-toggle {% if 'settings' in request.resolver_match.route %}active{% endif %}"
+                      role="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
                       {% translate 'Settings' %}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                      <li><a class="dropdown-item" href="{% url 'mail:settings_profile' %}">{% translate 'Profile' %}</a></li>
+                      <li>
+                        <a
+                          class="dropdown-item {% if 'settings' in request.resolver_match.route %}active{% endif %}"
+                          href="{% url 'mail:settings_profile' %}"
+                        >
+                          {% translate 'Profile' %}
+                        </a>
+                      </li>
                       <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item" href="{% url 'logout' %}">{% translate 'Logout' %}</a></li>
+                      <li>
+                        <a class="dropdown-item" href="{% url 'logout' %}">
+                          {% translate 'Logout' %}
+                        </a>
+                      </li>
                     </ul>
                   </li>
                 </ul>
