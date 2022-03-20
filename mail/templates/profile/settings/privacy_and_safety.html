@@ -2,14 +2,6 @@
 
 {% load i18n static helpers %}
 
-{% block extra_style %}
-  <link
-    href="{% static 'lib/css/profile/settings/settings.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
-    rel="stylesheet"
-    media="screen"
-  >
-{% endblock %}
-
 {% block title %}{% translate 'Settings' %}{% endblock %}
 
 {% block settings_content %}

@@ -10,12 +10,10 @@
   >
 {% endblock %}
 
-{% block title %}{% translate 'Settings' %}{% endblock %}
-
 {% block content %}
   <div class="container">
     <div class="row gutters">
-      {% block settings_link_block %}
+      {% block link_block %}
         <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
           <div class="card h-100">
             <div class="card-body">
@@ -23,13 +21,8 @@
                 {% with request.resolver_match.url_name as url_name %}
                   <ul class="list-group">
                     <a href="{% url 'mail:settings' %}" class="text-decoration-none">
-                      <li class="list-group-item {% if url_name == 'settings_profile' %}active{% endif %}">
-                        {% translate 'Profile' %}
-                      </li>
-                    </a>
-                    <a href="{% url 'mail:privacy_and_safety' %}" class="text-decoration-none">
-                      <li class="list-group-item {% if url_name == 'privacy_and_safety' %}active{% endif %}">
-                        {% translate 'Privacy and safety' %}
+                      <li class="list-group-item {% if url_name == 'feed' %}active{% endif %}">
+                        {% translate 'Feed' %}
                       </li>
                     </a>
                   </ul>
@@ -42,7 +35,7 @@
         <div class="col-xl-9 col-lg-9 col-md-12 col-sm-12 col-12">
           <div class="card h-100">
             <div class="card-body">
-              {% block settings_content %}
+              {% block wall_content %}
               {% endblock %}
             </div>
           </div>

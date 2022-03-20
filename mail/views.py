@@ -78,7 +78,7 @@ class Profile(LoginRequiredMixin, View):
 
         return render(
             request,
-            'profile/profile.html',
+            'profile/profile/index.html',
             {
                 'messages': _obj,
                 'amount': len(_messages)
