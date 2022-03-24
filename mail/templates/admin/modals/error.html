@@ -1,0 +1,29 @@
+{% load i18n %}
+
+{% if errors %}
+  <div
+    class="modal fade"
+    id="errors-modal"
+    tabindex="-1"
+    aria-labelledby="errors-modal-label"
+    aria-modal="true"
+    role="dialog"
+  >
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-danger">{% translate 'Error' %}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% for key, error in errors.items %}
+            <p>{{ key }}: {{ error }}</p>
+          {% endfor %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% translate 'Close' %}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}

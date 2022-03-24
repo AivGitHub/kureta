@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 import magic
 
 from mail.managers import UserManager
+from mail.utils import System
 
 _magic = magic.Magic(mime=True)
 
@@ -72,6 +73,11 @@ class User(AbstractBaseUser, PermissionsMixin):
         null=False,
         blank=False,
         unique=True
+    )
+    avatar = models.ImageField(
+        upload_to=System.user_photo_path,
+        null=True,
+        blank=True
     )
 
     objects = UserManager()
@@ -145,7 +151,7 @@ class Message(models.Model):
         null=True,
         blank=True
     )
-    sender = models.OneToOneField(
+    sender = models.ForeignKey(
         User,
         on_delete=models.CASCADE
     )
@@ -236,3 +242,37 @@ class Attachment(models.Model):
             self.name = _file.name
 
         super().save()
+
+
+class WallMessage(models.Model):
+    subject = models.CharField(
+        _('Subject'),
+        max_length=512,
+        null=True,
+        blank=True
+    )
+    body = models.TextField(
+        _('Text body'),
+        null=True,
+        blank=True
+    )
+    sender = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+    tags = models.TextField(
+        _('Text body'),
+        null=True,
+        blank=True
+    )
+    post_time = models.DateTimeField(
+        _('Post time'),
+        default=timezone.now
+    )
+
+    class Meta:
+        verbose_name = _('Wall message')
+        verbose_name_plural = _('Wall messages')
+
+    def __str__(self) -> str:
+        return str(self.pk)

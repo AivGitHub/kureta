@@ -1,0 +1,101 @@
+{% extends 'base_site.html' %}
+
+{% load i18n static helpers %}
+
+{% block extra_style %}
+  <link
+    href="{% static 'lib/css/admin/main.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    rel="stylesheet"
+    media="screen"
+  >
+{% endblock %}
+
+{% block title %}{% translate 'Profile' %}{% endblock %}
+
+{% block side_panel_body %}
+  <ul class="list-group w-100">
+      <li class="list-group-item border-0">
+        <img
+          src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
+          width="240"
+          height="240"
+        />
+      </li>
+      <li class="list-group-item border-0">
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-bs-toggle="modal"
+          data-bs-target="#{{ user_form.avatar.id_for_label }}-modal"
+        >
+        {% if user.avatar %}
+          {% translate 'Change profile image' %}
+        {% else %}
+          {% translate 'Upload profile image' %}
+        {% endif %}
+        </button>
+      </li>
+  </ul>
+{% endblock %}
+
+{% block main_content %}
+  Username: {{ user }}
+  <br>
+
+  {{ wall_messages | length }}
+
+  {% for message in wall_messages %}
+    {% include 'admin/profile/wall_message.html' with message=message %}
+    <hr>
+  {% endfor %}
+
+  <ul class="pagination {% if wall_messages.paginator.num_pages == 1 %}d-none{% endif %}">
+      {% if wall_messages.has_previous %}
+        <li class="page-item">
+          <a class="page-link" href="?wall_page={{ wall_messages.previous_page_number }}">
+            {% translate 'Previous' %}
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link" href="">
+            {% translate 'Previous' %}
+          </a>
+        </li>
+      {% endif %}
+
+      <li class="page-item active">
+        <a class="page-link">
+          {{ wall_messages.number }} {% translate 'of' %} {{ wall_messages.paginator.num_pages }}
+        </a>
+      </li>
+
+      {% if wall_messages.has_next %}
+        <li class="page-item">
+          <a class="page-link" href="?wall_page={{ wall_messages.next_page_number }}">
+            {% translate 'Next' %}
+          </a>
+        </li>
+      {% else %}
+        <li class="page-item disabled">
+          <a class="page-link">
+            {% translate 'Next' %}
+          </a>
+        </li>
+      {% endif %}
+  </ul>
+  {% if errors %}
+    {% include 'admin/modals/error.html' with errors=errors %}
+  {% endif %}
+  {% include 'admin/modals/upload.html' with field=user_form.avatar %}
+{% endblock %}
+
+{% block extra_script %}
+  {% if errors %}
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $('#errors-modal').modal('show');
+      });
+    </script>
+  {% endif %}
+{% endblock %}

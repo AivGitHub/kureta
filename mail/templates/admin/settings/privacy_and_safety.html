@@ -1,6 +1,14 @@
-{% extends 'profile/settings/base.html' %}
+{% extends 'base_site.html' %}
 
 {% load i18n static helpers %}
+
+{% block extra_style %}
+  <link
+    href="{% static 'lib/css/admin/main.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    rel="stylesheet"
+    media="screen"
+  >
+{% endblock %}
 
 {% block title %}{% translate 'Settings' %}{% endblock %}
 

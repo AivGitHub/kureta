@@ -1,5 +1,10 @@
-.container {
-  margin: 100px auto;
+.list-group-item {
+  cursor: pointer;
+}
+
+.list-group-item > .active {
+  text-color: red;
+  background-color: red;
 }
 
 .panel-header {
@@ -35,10 +40,10 @@ select {
   cursor: pointer;
 }
 
-input[type='email'],
 input[type='text'],
 input[type='password'] {
   border: none;
   outline: none;
   width: 100%;
 }
+

@@ -10,3 +10,4 @@ kureta.egg-info/
 .idea/
 secure.py
 static/external_lib/
+media/

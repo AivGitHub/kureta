@@ -10,7 +10,9 @@ from django.db.utils import ProgrammingError
 from django.utils.translation import gettext_lazy as _
 
 from mail.models import (
-    Server, User
+    Server,
+    User,
+    WallMessage
 )
 import settings
 
@@ -242,3 +244,10 @@ class AuthenticationForm(DjangoAuthenticationForm):
                 self.confirm_login_allowed(self.user_cache)
 
         return self.cleaned_data
+
+
+class WallMessageForm(forms.ModelForm):
+
+    class Meta:
+        model = WallMessage
+        fields = '__all__'

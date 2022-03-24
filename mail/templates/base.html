@@ -30,11 +30,11 @@
 
     <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}"/>
   </head>
-  <body>
-    {% block parent_navbar %}
+  <body class="modal-open">
+    {% block navbar %}
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container-fluid">
-          <a class="navbar-brand" href="/">Kureta</a>
+          <a class="navbar-brand" href="/">{% get_setting_value 'PROJECT_NAME' %}</a>
           <button
             class="navbar-toggler"
             type="button"
@@ -47,7 +47,7 @@
             <span class="navbar-toggler-icon"></span>
           </button>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            {% block breadcrumb %}
+            {% block breadcrumbs %}
               <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 {% if not user.is_authenticated %}
                   {% with request.resolver_match.url_name as url_name %}
@@ -129,23 +129,28 @@
       </nav>
     {% endblock %}
 
-    <div class="container-fluid">
-      {% block content %}
-      {% endblock %}
+    <div class="wrapper-container">
+      <div class="container mt-3 mb-3">
+        {% block content %}
+          {% block side_panel %}
+          {% endblock %}
+        {% endblock %}
+      </div>
     </div>
 
-    <footer class="bg-light text-center text-lg-start mt-auto fixed-bottom">
-      {% block footer %}
+    {% block footer %}
+      <footer class="bg-light text-center text-lg-start mt-auto fixed-bottom">
         <div class="text-center p-3">
           © 2022 Copyright
         </div>
-      {% endblock %}
-    </footer>
+      </footer>
+    {% endblock %}
 
     {% block script %}
       <script src="{% static 'admin/js/vendor/jquery/jquery.js' %}"></script>
       <script src="{% static 'external_lib/bootstrap/js/bootstrap.min.js' %}"></script>
     {% endblock %}
+
     {% block extra_script %}
     {% endblock %}
   </body>

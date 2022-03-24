@@ -1,0 +1,29 @@
+{% extends 'base_site.html' %}
+
+{% load i18n static helpers %}
+
+{% block extra_style %}
+  <link
+    href="{% static 'lib/css/admin/main.css' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    rel="stylesheet"
+    media="screen"
+  >
+{% endblock %}
+
+{% block title %}{% translate 'Feed' %}{% endblock %}
+
+{% block side_panel_body %}
+  {% with request.resolver_match.url_name as url_name %}
+    <ul class="list-group w-100">
+      <a href="{% url 'mail:feed' %}" class="text-decoration-none">
+        <li class="list-group-item {% if url_name == 'feed' %}active{% endif %}">
+          {% translate 'Feed' %}
+        </li>
+      </a>
+    </ul>
+  {% endwith %}
+{% endblock %}
+
+{% block main_content %}
+  asd
+{% endblock %}

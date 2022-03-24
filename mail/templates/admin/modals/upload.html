@@ -1,0 +1,44 @@
+{% load i18n %}
+
+<div
+  class="modal fade"
+  id="{{ field.id_for_label }}-modal"
+  tabindex="-1"
+  aria-labelledby="{{ field.id_for_label }}-modal-label"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="{{ field.id_for_label }}-modal-label">
+          {% translate 'Upload' %}
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="body-desc">
+          {% translate 'It will be easier for your friends to recognize you if you upload your real photo.' %}
+          <br />
+          {% translate 'JPG or PNG formats are supported.' %}
+        </p>
+        <div class="photo-input">
+          {{ field }}
+          <button
+            class="btn btn-sm btn-primary"
+            onclick="document.getElementById('{{ field.id_for_label }}').click(); return false;"
+          >
+            {% translate 'Select a file' %}
+          </button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-sm btn-primary">
+          {% translate 'Save' %}
+        </button>
+      </div>
+    </div>
+    </form>
+  </div>
+</div>
