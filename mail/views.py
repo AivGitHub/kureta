@@ -117,14 +117,14 @@ class ProfileView(LoginRequiredMixin, View):
 
         _id = request.user.pk
         _user = get_object_or_404(User, id=_id)
-        _form_name = request.POST.get('form')
+        _form_name = request.POST.get('post_form')
 
-        if _form_name == 'upload':
+        if _form_name == 'upload_form':
             form_class = modelform_factory(User, form=UserChangeForm, fields=('avatar',))
             form = form_class(request.POST, request.FILES, instance=_user)
 
             if form.is_valid():
-                form.save(commit=True)
+                form.save()
 
                 return redirect(request.META.get('HTTP_REFERER'))
 

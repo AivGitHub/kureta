@@ -40,6 +40,8 @@
 
 {% block main_content %}
   Username: {{ user }}
+  <br />
+  Nickname: {{ user.nick }}
 
   {% include 'admin/profile/wall.html' with wall_message_form=wall_message_form messages=wall_messages %}
 
