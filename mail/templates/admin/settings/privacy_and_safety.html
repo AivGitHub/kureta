@@ -50,5 +50,8 @@
 {% endblock %}
 
 {% block extra_script %}
-  <script src="{% static 'lib/js/helpers/form.js' %}?{% get_setting_value 'PROJECT_VERSION' %}"></script>
+  <script
+    src="{% static 'lib/js/helpers/form.js' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    type="application/javascript"
+  ></script>
 {% endblock %}
