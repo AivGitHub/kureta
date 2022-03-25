@@ -261,7 +261,7 @@ class WallMessage(models.Model):
         on_delete=models.CASCADE
     )
     tags = models.TextField(
-        _('Text body'),
+        _('Tags'),
         null=True,
         blank=True
     )

@@ -40,50 +40,9 @@
 
 {% block main_content %}
   Username: {{ user }}
-  <br>
 
-  {{ wall_messages | length }}
+  {% include 'admin/profile/wall.html' with wall_message_form=wall_message_form messages=wall_messages %}
 
-  {% for message in wall_messages %}
-    {% include 'admin/profile/wall_message.html' with message=message %}
-    <hr>
-  {% endfor %}
-
-  <ul class="pagination {% if wall_messages.paginator.num_pages == 1 %}d-none{% endif %}">
-      {% if wall_messages.has_previous %}
-        <li class="page-item">
-          <a class="page-link" href="?wall_page={{ wall_messages.previous_page_number }}">
-            {% translate 'Previous' %}
-          </a>
-        </li>
-      {% else %}
-        <li class="page-item disabled">
-          <a class="page-link" href="">
-            {% translate 'Previous' %}
-          </a>
-        </li>
-      {% endif %}
-
-      <li class="page-item active">
-        <a class="page-link">
-          {{ wall_messages.number }} {% translate 'of' %} {{ wall_messages.paginator.num_pages }}
-        </a>
-      </li>
-
-      {% if wall_messages.has_next %}
-        <li class="page-item">
-          <a class="page-link" href="?wall_page={{ wall_messages.next_page_number }}">
-            {% translate 'Next' %}
-          </a>
-        </li>
-      {% else %}
-        <li class="page-item disabled">
-          <a class="page-link">
-            {% translate 'Next' %}
-          </a>
-        </li>
-      {% endif %}
-  </ul>
   {% if errors %}
     {% include 'admin/modals/error.html' with errors=errors %}
   {% endif %}

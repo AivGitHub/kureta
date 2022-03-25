@@ -16,7 +16,8 @@ from mail.models import (
 from mail.forms import (
     PasswordChangeForm,
     UserChangeForm,
-    UserCreationForm
+    UserCreationForm,
+    WallMessageForm
 )
 
 
@@ -79,7 +80,7 @@ class ProfileView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         _id = request.user.pk
 
-        _messages = WallMessage.objects.filter(sender_id=_id).order_by('id')
+        _messages = WallMessage.objects.filter(sender_id=_id).order_by('-id')
         _paginator = Paginator(_messages, 10)
         _page = request.GET.get('wall_page')
         _obj = _paginator.get_page(_page)
@@ -96,31 +97,53 @@ class ProfileView(LoginRequiredMixin, View):
             }
         )
 
+        wall_message_form = WallMessageForm()
+
         return render(
             request,
             'admin/profile/profile.html',
             {
                 'wall_messages': _obj,
                 'user_form': user_form,
-                'errors': kwargs.get('errors')
+                'errors': kwargs.get('errors'),
+                'wall_message_form': wall_message_form
             }
         )
 
     def post(self, request, *args, **kwargs):
+        """
+        TODO: Think why "form_name in request.POST" does not work. Remove useless hidden inputs with form name.
+        """
+
         _id = request.user.pk
         _user = get_object_or_404(User, id=_id)
+        _form_name = request.POST.get('form')
 
-        form_class = modelform_factory(User, form=UserChangeForm, fields=('avatar',))
-        form = form_class(request.POST, request.FILES, instance=_user)
+        if _form_name == 'upload':
+            form_class = modelform_factory(User, form=UserChangeForm, fields=('avatar',))
+            form = form_class(request.POST, request.FILES, instance=_user)
 
-        if form.is_valid():
-            form.save(commit=True)
+            if form.is_valid():
+                form.save(commit=True)
 
-            return redirect(request.META.get('HTTP_REFERER'))
+                return redirect(request.META.get('HTTP_REFERER'))
 
-        kwargs.update({'errors': form.errors})
+            kwargs.update({'errors': form.errors})
 
-        return self.get(request, *args, **kwargs)
+            return self.get(request, *args, **kwargs)
+        elif _form_name == 'wall_message_form':
+            form = WallMessageForm(request.POST, request.FILES)
+
+            if form.is_valid():
+                form.save(request=request)
+
+                return redirect(request.META.get('HTTP_REFERER'))
+
+            kwargs.update({'errors': form.errors})
+
+            return self.get(request, *args, **kwargs)
+
+        return redirect(request.META.get('HTTP_REFERER'))
 
 
 class SettingsView(LoginRequiredMixin, View):

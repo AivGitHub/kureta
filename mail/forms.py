@@ -247,7 +247,45 @@ class AuthenticationForm(DjangoAuthenticationForm):
 
 
 class WallMessageForm(forms.ModelForm):
+    subject = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'cols': 200,
+                'rows': 1,
+                'style': 'width: 100%'
+            }
+        )
+    )
+    body = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'cols': 200,
+                'rows': 3,
+                'style': 'width: 100%'
+            }
+        )
+    )
+    tags = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'cols': 200,
+                'rows': 1,
+                'style': 'width: 100%'
+            }
+        )
+    )
 
     class Meta:
         model = WallMessage
-        fields = '__all__'
+        fields = ('subject', 'body', 'tags')
+
+    def save(self, commit=True, request=None):
+        message = super().save(commit=False)
+
+        if request:
+            message.sender = request.user
+
+        if commit:
+            message.save()
+
+        return message
