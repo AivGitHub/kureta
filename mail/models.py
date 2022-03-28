@@ -260,6 +260,11 @@ class WallMessage(models.Model):
         User,
         on_delete=models.CASCADE
     )
+    recipient = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='wall_message_recipient'
+    )
     tags = models.TextField(
         _('Tags'),
         null=True,

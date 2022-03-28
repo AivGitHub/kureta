@@ -9,12 +9,13 @@
 >
 <div class="modal-dialog">
   <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     <input
       type="hidden"
-      name="post_form"
+      name="form_name"
       value="upload_form"
     >
-    {% csrf_token %}
+
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="{{ field.id_for_label }}-modal-label">

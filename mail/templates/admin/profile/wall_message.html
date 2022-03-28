@@ -3,6 +3,22 @@
 <div class="container">
   <div class="message_header">
     <h5 class="fw-bolder mb-1">{{ message.subject }}</h5>
+    <h6>
+      {% if message.sender.nick %}
+        <a href="{% url 'mail:profile_str' nick=message.sender.nick %}" class="text-decoration-none">
+          {{ message.sender.username }}
+        </a>
+      {% else %}
+        <a href="{% url 'mail:profile_int' id=message.sender.id %}" class="text-decoration-none">
+          {{ message.sender.username }}
+        </a>
+      {% endif %}
+    </h6>
+    <img
+      src="{% if message.sender.avatar %}{{ message.sender.avatar.url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
+      width="50"
+      height="50"
+    />
     <div class="text-muted fst-italic mb-2 fs-6">{{ message.post_time }}</div>
     {% for tag in message.tags|split:";" %}
       <span class="badge bg-secondary text-decoration-none link-light">{{ tag }}</span>

@@ -250,40 +250,49 @@ class WallMessageForm(forms.ModelForm):
     subject = forms.CharField(
         widget=forms.Textarea(
             attrs={
-                'cols': 200,
+                'cols': 20,
                 'rows': 1,
-                'style': 'width: 100%'
+                'style': 'width: 50%',
+                'class': 'form-control',
+                'placeholder': _('Subject'),
             }
-        )
-    )
-    body = forms.CharField(
-        widget=forms.Textarea(
-            attrs={
-                'cols': 200,
-                'rows': 3,
-                'style': 'width: 100%'
-            }
-        )
+        ),
+        required=False
     )
     tags = forms.CharField(
         widget=forms.Textarea(
             attrs={
-                'cols': 200,
+                'cols': 20,
                 'rows': 1,
-                'style': 'width: 100%'
+                'style': 'width: 100%',
+                'class': 'form-control',
+                'placeholder': _('Tags'),
+            }
+        ),
+        required=False
+    )
+    body = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'cols': 20,
+                'rows': 3,
+                'style': 'width: 100%',
+                'class': 'form-control',
+                'placeholder': _('Message')
             }
         )
     )
 
     class Meta:
         model = WallMessage
-        fields = ('subject', 'body', 'tags')
+        fields = ('subject', 'tags', 'body')
 
-    def save(self, commit=True, request=None):
+    def save(self, commit=True, request=None, **kwargs):
         message = super().save(commit=False)
 
         if request:
-            message.sender = request.user
+            message.sender = kwargs.get('sender')
+            message.recipient = kwargs.get('recipient')
 
         if commit:
             message.save()

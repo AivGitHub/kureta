@@ -3,17 +3,21 @@
 <hr />
 
 <form method="POST">
-  <input
-    type="hidden"
-    name="post_form"
-    value="wall_message_form"
-  >
   {% csrf_token %}
-  {{ wall_message_form.as_p }}
-  <button class="btn btn-primary btn-block mt-3">
+
+  {% for field in wall_message_form %}
+    <div class="form-group py-2">
+      <div class="textarea-field">
+        {{ field }}
+      </div>
+    </div>
+  {% endfor %}
+  <button class="btn btn-primary btn-block mt-3" name="form_name" value="wall_message_form">
     {% translate 'Post' %}
   </button>
 </form>
+
+<hr />
 
 {% for message in messages %}
   {% include 'admin/profile/wall_message.html' with message=message %}

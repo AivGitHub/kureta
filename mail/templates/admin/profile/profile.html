@@ -14,13 +14,14 @@
 
 {% block side_panel_body %}
   <ul class="list-group w-100">
-      <li class="list-group-item border-0">
-        <img
-          src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
-          width="240"
-          height="240"
-        />
-      </li>
+    <li class="list-group-item border-0">
+      <img
+        src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
+        width="240"
+        height="240"
+      />
+    </li>
+    {% if user == request.user %}
       <li class="list-group-item border-0">
         <button
           type="button"
@@ -35,6 +36,7 @@
         {% endif %}
         </button>
       </li>
+    {% endif %}
   </ul>
 {% endblock %}
 
@@ -45,10 +47,12 @@
 
   {% include 'admin/profile/wall.html' with wall_message_form=wall_message_form messages=wall_messages %}
 
-  {% if errors %}
-    {% include 'admin/modals/error.html' with errors=errors %}
+  {% if user == request.user %}
+    {% if errors %}
+      {% include 'admin/modals/error.html' with errors=errors %}
+    {% endif %}
+    {% include 'admin/modals/upload.html' with field=user_form.avatar %}
   {% endif %}
-  {% include 'admin/modals/upload.html' with field=user_form.avatar %}
 {% endblock %}
 
 {% block extra_script %}
