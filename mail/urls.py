@@ -2,6 +2,7 @@ from django.urls import path
 from django.views.generic import RedirectView
 
 from mail.views import (
+    CommunicationView,
     FeedView,
     ProfileView,
     SettingsView,
@@ -19,6 +20,7 @@ urlpatterns = [
     path('profile/<int:id>/', ProfileView.as_view(), name='profile_int'),
     path('profile/<str:nick>/', ProfileView.as_view(), name='profile_str'),
     path('profile/wall', WallView.as_view(), name='wall'),
+    path('profile/communication', CommunicationView.as_view(), name='communication'),
     path('settings/', RedirectView.as_view(url='/mail/settings/profile/'), name='settings'),
     path('settings/profile/', SettingsView.as_view(), name='settings_profile'),
 ]

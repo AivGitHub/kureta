@@ -101,6 +101,7 @@ class ProfileView(LoginRequiredMixin, View):
             widgets={
                 'avatar': forms.FileInput(
                     attrs={
+                        'class': 'd-none'
                     }
                 )
             }
@@ -216,6 +217,12 @@ class WallView(View):
 
     def post(self, request, *args, **kwargs):
         raise Exception('Posted')
+
+
+class CommunicationView(View):
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'admin/profile/communication.html')
 
 
 class ErrorHandler404(View):

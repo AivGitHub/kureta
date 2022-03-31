@@ -8,7 +8,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 import magic
+from PIL import Image
 
+import settings
 from mail.managers import UserManager
 from mail.utils import System
 
@@ -85,6 +87,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     EMAIL_FIELD = 'email'
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = []
+    AVATAR_WIDTH = 250
+    AVATAR_HEIGHT = 250
 
     class Meta:
         verbose_name = _('User')
@@ -92,6 +96,20 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self) -> str:
         return self.username
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        if self.avatar:
+            _avatar_path = pathlib.Path(self.avatar.path)
+            _media_root_path = pathlib.Path(settings.MEDIA_ROOT)
+            _avatar_thumbnail_name = f'{_avatar_path.stem}_thumbnail{_avatar_path.suffix}'
+            _avatar_thumbnail_path = _media_root_path / System.user_photo_path(self, _avatar_thumbnail_name)
+
+            _avatar_thumbnail = Image.open(self.avatar)
+
+            _avatar_thumbnail.thumbnail((self.AVATAR_WIDTH, self.AVATAR_HEIGHT))
+            _avatar_thumbnail.save(_avatar_thumbnail_path)
 
     def clean(self) -> None:
         super().clean()
@@ -107,6 +125,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_short_name(self) -> str:
         return self.first_name
+
+    def get_avatar_thumbnail_url(self):
+        if not self.avatar:
+            return pathlib.Path(settings.STATIC_ROOT) / 'img/admin/profile.png'
+
+        _avatar_path = pathlib.Path(self.avatar.url)
+
+        return _avatar_path.parent / f'{_avatar_path.stem}_thumbnail{_avatar_path.suffix}'
 
     def email_user(self, subject, message, from_email=None, **kwargs) -> None:
         send_mail(subject, message, from_email, [self.email], **kwargs)

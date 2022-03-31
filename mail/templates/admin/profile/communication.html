@@ -14,47 +14,26 @@
 
 {% block side_panel_body %}
   <ul class="list-group w-100">
-    <li class="list-group-item border-0 text-center">
+    <li class="list-group-item border-0">
       <img
-        src="{% if user.avatar %}{{ user.get_avatar_thumbnail_url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
-        width="250"
-        height="250"
+        src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
+        width="240"
+        height="240"
       />
     </li>
     {% if user == request.user %}
-      <li class="list-group-item border-0 text-center">
+      <li class="list-group-item border-0">
         <button
           type="button"
           class="btn btn-primary"
           data-bs-toggle="modal"
           data-bs-target="#{{ user_form.avatar.id_for_label }}-modal"
         >
-          {% if user.avatar %}
-            {% translate 'Change profile image' %}
-          {% else %}
-            {% translate 'Upload profile image' %}
-          {% endif %}
-        </button>
-      </li>
-      <li class="list-group-item border-0">
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#user-{{ user.pk }}-modal"
-        >
-          {% translate 'Communication' %}
-        </button>
-      </li>
-    {% else %}
-      <li class="list-group-item border-0">
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#user-{{ user.pk }}-modal"
-        >
-          {% translate 'compose' %}
+        {% if user.avatar %}
+          {% translate 'Change profile image' %}
+        {% else %}
+          {% translate 'Upload profile image' %}
+        {% endif %}
         </button>
       </li>
     {% endif %}
