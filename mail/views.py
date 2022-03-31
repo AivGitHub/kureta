@@ -27,7 +27,6 @@ class RegisterView(View):
     register_template = 'registration/register.html'
 
     def get(self, request, *args, **kwargs):
-
         if request.user.is_authenticated:
             return redirect('/mail/')
 
@@ -50,13 +49,13 @@ class RegisterView(View):
 class LoginView(DjangoLoginView):
 
     def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('/mail/')
+
         _registered = request.GET.get('registered', None)
 
         if _registered == 'true':
             self.extra_context = {'registered': 'true'}
-
-        if request.user.is_authenticated:
-            return redirect('/mail/')
 
         return super().get(self, request, *args, **kwargs)
 
@@ -216,7 +215,7 @@ class PrivacyAndSafetySettings(LoginRequiredMixin, View):
 class WallView(View):
 
     def post(self, request, *args, **kwargs):
-        raise Exception('posted')
+        raise Exception('Posted')
 
 
 class ErrorHandler404(View):

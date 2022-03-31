@@ -1,0 +1,13 @@
+{% extends 'base_site.html' %}
+
+{% load i18n static helpers %}
+
+{% block title %}{% translate 'Error 500' %}{% endblock %}
+
+{% block content %}
+  {% translate 'Something went wrong!' %}
+  {% if error_token %}
+    <br />
+    {% translate 'Please share this token with administrator' %}: {{ error_token }}
+  {% endif %}
+{% endblock %}
