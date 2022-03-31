@@ -1,0 +1,42 @@
+{% extends 'base_site.html' %}
+
+{% load i18n static helpers %}
+
+{% block extra_breadcrumb %}
+  <li class="nav-item" id="nav-secret-item">
+    <a
+      class="nav-link active"
+      href="{% url 'mail:feed' %}"
+    >
+      <span class="d-block">{% translate 'Secret Place' %}</span>
+      <span class="d-none">{% translate 'Go Home' %}</span>
+    </a>
+  </li>
+{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="offset-md-2 col-lg-7 col-md-7 offset-lg-3 offset-md-3">
+      <div class="panel">
+        <div class="panel-header">
+          <h2 class="pt-3 font-weight-bold">
+            {% block error_header %}{% endblock %}
+          </h2>
+        </div>
+        <div class="panel-body pt-5">
+          {% block error_body %}{% endblock %}
+          <p class="pt-2">
+            {% translate 'Go' %} <a href="{{ request.META.HTTP_REFERER }}">{% translate 'Back' %}</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_script %}
+  <script
+    src="{% static 'lib/js/helpers/error.js' %}?{% get_setting_value 'PROJECT_VERSION' %}"
+    type="application/javascript"
+  ></script>
+{% endblock %}

@@ -1,13 +1,16 @@
-{% extends 'base_site.html' %}
+{% extends 'error_handlers/master_error.html' %}
 
-{% load i18n static helpers %}
+{% load i18n %}
 
 {% block title %}{% translate 'Error 500' %}{% endblock %}
 
-{% block content %}
+{% block error_header %}
   {% translate 'Something went wrong!' %}
-  {% if error_token %}
-    <br />
-    {% translate 'Please share this token with administrator' %}: {{ error_token }}
+{% endblock %}
+
+{% block error_body %}
+  {% if unique_token %}
+    <p>{% translate 'Please share this token with administrator:' %}</p>
+    <p class="text-danger">{{ unique_token }}</p>
   {% endif %}
 {% endblock %}

@@ -1,7 +1,7 @@
 from uuid import uuid4
 
-from django.utils.deprecation import MiddlewareMixin
 from django.shortcuts import render
+from django.utils.deprecation import MiddlewareMixin
 
 import settings
 
@@ -14,4 +14,4 @@ class KuretaMiddleware(MiddlewareMixin):
         if not settings.DEBUG:
             raise exception
         else:
-            return render(request, 'error_handlers/500.html', {'error_token': uuid4()})
+            return render(request, 'error_handlers/500.html', {'unique_token': uuid4()})

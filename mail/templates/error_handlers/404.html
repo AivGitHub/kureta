@@ -1,7 +1,13 @@
-{% extends 'base_site.html' %}
+{% extends 'error_handlers/master_error.html' %}
+
+{% load i18n %}
 
 {% block title %}{% translate 'Error 404' %}{% endblock %}
 
-{% block content %}
-  404
+{% block error_header %}
+  {% translate 'You found the secret page!' %}
+{% endblock %}
+
+{% block error_body %}
+    <p>{% translate 'Congratulations!' %}</p>
 {% endblock %}
