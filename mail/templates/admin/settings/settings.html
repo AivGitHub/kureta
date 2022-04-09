@@ -12,6 +12,29 @@
 
 {% block title %}{% translate 'Settings' %}{% endblock %}
 
+{% block side_panel_body %}
+  <div class="list-group w-100">
+    {% with request.resolver_match.url_name as url_name %}
+      <a
+        class="list-group-item list-group-item-action {% if url_name == 'settings_profile' %}active{% endif %}"
+        href="{% url 'mail:settings_profile' %}"
+      >
+        <div class="d-flex w-100 justify-content-between">
+          {% translate 'Profile settings' %}
+        </div>
+      </a>
+      <a
+        class="list-group-item list-group-item-action {% if url_name == 'privacy_and_safety' %}active{% endif %}"
+        href="{% url 'mail:privacy_and_safety' %}"
+      >
+        <div class="d-flex w-100 justify-content-between">
+          {% translate 'Privacy and safety' %}
+        </div>
+      </a>
+    {% endwith %}
+  </div>
+{% endblock %}
+
 {% block main_content %}
   Profile settings
 {% endblock %}

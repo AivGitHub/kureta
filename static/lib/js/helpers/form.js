@@ -6,7 +6,11 @@ $(document).ready(function() {
     }
   } catch {}
 
-  $('.fa-eye-toggle').on('click', function(event){
+  $('.input-field').on('click', function(event) {
+    $(this).find('input').focus();
+  })
+
+  $('.fa-eye-toggle').on('click', function(event) {
     var parent = $(this).parent();
     var input = parent.children('input');
     var farSpan = $(this).children('span');
@@ -22,7 +26,7 @@ $(document).ready(function() {
     }
   });
 
-  $('#id_username').on('input', function(){
+  $('#id_username').on('input', function() {
     var val = $(this).val();
     var parentServer = $(this).next();
 

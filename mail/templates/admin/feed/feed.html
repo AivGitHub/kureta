@@ -14,13 +14,15 @@
 
 {% block side_panel_body %}
   {% with request.resolver_match.url_name as url_name %}
-    <ul class="list-group w-100">
+    <div class="list-group w-100">
       <a href="{% url 'mail:feed' %}" class="text-decoration-none">
-        <li class="list-group-item {% if url_name == 'feed' %}active{% endif %}">
+        <div
+          class="list-group-item list-group-item-action {% if url_name == 'feed' %}active{% endif %}"
+        >
           {% translate 'Feed' %}
-        </li>
+        </div>
       </a>
-    </ul>
+    </div>
   {% endwith %}
 {% endblock %}
 

@@ -26,7 +26,9 @@
     {% block extra_style %}
     {% endblock %}
 
-    <title>{% block title %}{% endblock %}</title>
+    <title>
+      {% block title %}{% endblock %} | {% block extra_title %}{% get_setting_value 'PROJECT_NAME' %}{% endblock %}
+    </title>
 
     <link rel="shortcut icon" type="image/png" href="{% static 'img/favicon.ico' %}"/>
   </head>
@@ -82,7 +84,7 @@
                     </li>
                     <li class="nav-item">
                       <a
-                        class="nav-link {% if url_name == 'profile' %}active{% endif %}"
+                        class="nav-link {% if url_name == 'profile' or url_name == 'profile_str' or url_name == 'profile_int' %}active{% endif %}"
                         href="{% url 'mail:profile' %}"
                       >
                         {% translate 'Profile' %}

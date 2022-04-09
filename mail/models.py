@@ -119,9 +119,19 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.username.split('@')[1]
 
     def get_full_name(self) -> str:
-        full_name = f'{self.first_name} {self.last_name}'
+        if self.first_name and self.last_name:
+            return f'{self.first_name} {self.last_name}'
 
-        return full_name.strip()
+        if self.first_name:
+            return self.first_name
+
+        if self.last_name:
+            return self.last_name
+
+        if self.nick:
+            return self.nick
+
+        return self.username
 
     def get_short_name(self) -> str:
         return self.first_name

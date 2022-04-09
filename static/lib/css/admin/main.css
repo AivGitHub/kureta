@@ -47,3 +47,7 @@ input[type='password'] {
   width: 100%;
 }
 
+.list-group-item > button,
+.list-group-item > a {
+  width: 250px;
+}

@@ -179,7 +179,7 @@ class SettingsView(LoginRequiredMixin, View):
         )
 
 
-class PrivacyAndSafetySettings(LoginRequiredMixin, View):
+class PrivacyAndSafetySettingsView(LoginRequiredMixin, View):
     """
     Careful: PasswordChangeForm need user in first argument.
     """
@@ -193,7 +193,7 @@ class PrivacyAndSafetySettings(LoginRequiredMixin, View):
             request,
             self.privacy_and_safety_settings_template,
             {
-                'form': change_password_form
+                'change_password_form': change_password_form
             }
         )
 
@@ -208,18 +208,20 @@ class PrivacyAndSafetySettings(LoginRequiredMixin, View):
             request,
             self.privacy_and_safety_settings_template,
             {
-                'form': change_password_form
+                'change_password_form': change_password_form
             }
         )
 
 
-class WallView(View):
+class WallView(LoginRequiredMixin, View):
+    login_url = '/login/'
 
     def post(self, request, *args, **kwargs):
         raise Exception('Posted')
 
 
-class CommunicationView(View):
+class CommunicationView(LoginRequiredMixin, View):
+    login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         return render(request, 'admin/profile/communication.html')

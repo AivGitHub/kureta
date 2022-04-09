@@ -10,19 +10,19 @@
   >
 {% endblock %}
 
-{% block title %}{% translate 'Profile' %}{% endblock %}
+{% block title %}
+  {{ user.get_full_name }}
+{% endblock %}
 
 {% block side_panel_body %}
-  <ul class="list-group w-100">
-    <li class="list-group-item border-0 text-center">
+  <div class="list-group w-100">
+    <div class="list-group-item border-0 text-center">
       <img
         src="{% if user.avatar %}{{ user.get_avatar_thumbnail_url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
-        width="250"
-        height="250"
       />
-    </li>
+    </div>
     {% if user == request.user %}
-      <li class="list-group-item border-0 text-center">
+      <div class="list-group-item border-0 text-center">
         <button
           type="button"
           class="btn btn-primary"
@@ -35,30 +35,28 @@
             {% translate 'Upload profile image' %}
           {% endif %}
         </button>
-      </li>
-      <li class="list-group-item border-0">
-        <button
-          type="button"
+      </div>
+      <div class="list-group-item border-0 text-center">
+        <a
           class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#user-{{ user.pk }}-modal"
+          href="{% url 'mail:communication' %}"
         >
           {% translate 'Communication' %}
-        </button>
-      </li>
+        </a>
+      </div>
     {% else %}
-      <li class="list-group-item border-0">
+      <div class="list-group-item border-0 text-center">
         <button
           type="button"
           class="btn btn-primary"
           data-bs-toggle="modal"
-          data-bs-target="#user-{{ user.pk }}-modal"
+          data-bs-target="#compose-{{ user.pk }}-modal"
         >
-          {% translate 'compose' %}
+          {% translate 'Compose' %}
         </button>
-      </li>
+      </div>
     {% endif %}
-  </ul>
+  </div>
 {% endblock %}
 
 {% block main_content %}
@@ -72,7 +70,11 @@
     {% if errors %}
       {% include 'admin/modals/error.html' with errors=errors %}
     {% endif %}
+
     {% include 'admin/modals/upload.html' with field=user_form.avatar %}
+
+    {% else %}
+      {% include 'admin/modals/profile.html' with user=user form=compose_form %}
   {% endif %}
 {% endblock %}
 

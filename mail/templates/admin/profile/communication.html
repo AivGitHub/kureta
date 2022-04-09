@@ -10,57 +10,15 @@
   >
 {% endblock %}
 
-{% block title %}{% translate 'Profile' %}{% endblock %}
+{% block title %}{% translate 'Communication' %}{% endblock %}
 
 {% block side_panel_body %}
-  <ul class="list-group w-100">
-    <li class="list-group-item border-0">
-      <img
-        src="{% if user.avatar %}{{ user.avatar.url }}{% else %}{% static 'img/admin/profile.png' %}{% endif %}"
-        width="240"
-        height="240"
-      />
-    </li>
-    {% if user == request.user %}
-      <li class="list-group-item border-0">
-        <button
-          type="button"
-          class="btn btn-primary"
-          data-bs-toggle="modal"
-          data-bs-target="#{{ user_form.avatar.id_for_label }}-modal"
-        >
-        {% if user.avatar %}
-          {% translate 'Change profile image' %}
-        {% else %}
-          {% translate 'Upload profile image' %}
-        {% endif %}
-        </button>
-      </li>
-    {% endif %}
-  </ul>
+
 {% endblock %}
 
 {% block main_content %}
+  Communication
   Username: {{ user }}
   <br />
   Nickname: {{ user.nick }}
-
-  {% include 'admin/profile/wall.html' with wall_message_form=wall_message_form messages=wall_messages %}
-
-  {% if user == request.user %}
-    {% if errors %}
-      {% include 'admin/modals/error.html' with errors=errors %}
-    {% endif %}
-    {% include 'admin/modals/upload.html' with field=user_form.avatar %}
-  {% endif %}
-{% endblock %}
-
-{% block extra_script %}
-  {% if errors %}
-    <script type="text/javascript">
-      $(document).ready(function() {
-        $('#errors-modal').modal('show');
-      });
-    </script>
-  {% endif %}
 {% endblock %}
